@@ -1,116 +1,191 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Heart, Search } from 'lucide-react';
+import { Menu, X, Heart } from 'lucide-react';
 import { useWishlist } from '../hooks/useWishlist';
+
+const GROOM_CATS = ['Sherwani', 'Wedding Suit', 'Nehru Jacket', 'Kurta Pajama', 'Indo-Western'];
 
 const Navbar = ({ onOpenWishlist }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { wishlist } = useWishlist();
 
-  // Remove scrolled effect to keep "white border bottom" nav consistently
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Collection', path: '/catalog' },
     { name: 'About', path: '/about' },
   ];
 
-  const handleCategoryClick = (cat) => {
-    navigate(`/catalog?category=${cat}`);
-  };
+  const openWA = () =>
+    window.open(
+      `https://wa.me/919555835833?text=${encodeURIComponent('Hello! I visited SVG website and would like to know more about your groom collection.')}`,
+      '_blank'
+    );
 
   return (
-    <nav className="fixed w-full z-50 transition-all duration-300 bg-surface border-b-2 border-primary py-3">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center">
-          
-          {/* Left: Logo area */}
-          <Link to="/" className="brand-area">
-            <div className="brand-monogram">SVG</div>
-            <div className="brand-text hidden sm:block">
-              <div className="brand-name">SHRI VRINDAVAN GARMENTS</div>
-              <div className="brand-sub">Garment Exporter · Delhi</div>
+    <nav
+      className="fixed w-full z-50 transition-all duration-300"
+      style={{
+        height: '68px',
+        background: scrolled
+          ? 'rgba(12,10,8,0.95)'
+          : 'rgba(12,10,8,0.80)',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid var(--border)',
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+        <div className="flex justify-between items-center h-full">
+
+          {/* Left: Brand */}
+          <Link to="/" className="brand-area cursor-none">
+            <div className="nav-mono">
+              <span>SVG</span>
+            </div>
+            <div className="hidden sm:block">
+              <div className="brand-name">Shri Vrindavan Garments</div>
+              <div className="brand-sub">The Groom's House · Delhi</div>
             </div>
           </Link>
 
-          {/* Center: Category quick links (new addition) */}
-          <div className="nav-cats hidden md:flex items-center space-x-2">
-            <button onClick={() => handleCategoryClick('Mens Shirts')}>Mens</button>
-            <button onClick={() => handleCategoryClick('Ladies Suits')}>Ladies</button>
-            <button onClick={() => handleCategoryClick('Kids Boys')}>Kids</button>
+          {/* Center: Category quick links */}
+          <div className="nav-cats hidden lg:flex items-center space-x-1">
+            {GROOM_CATS.map(cat => (
+              <button
+                key={cat}
+                onClick={() => navigate(`/catalog?category=${cat}`)}
+                className="cursor-none"
+              >
+                {cat}
+              </button>
+            ))}
           </div>
 
-          {/* Right: Keep existing nav right elements (wishlist, navLinks) */}
-          <div className="nav-right hidden md:flex items-center space-x-6">
-            {navLinks.map((link) => (
+          {/* Right: Nav links + Wishlist + WA */}
+          <div className="hidden md:flex items-center gap-6">
+            {navLinks.map(link => (
               <Link
                 key={link.name}
                 to={link.path}
-                className={`text-sm uppercase tracking-wider transition-colors hover:text-primary ${
-                  location.pathname === link.path ? 'text-primary font-medium' : 'text-text'
-                }`}
+                className={`nav-link cursor-none ${location.pathname === link.path ? 'active' : ''}`}
               >
                 {link.name}
               </Link>
             ))}
 
-            {/* Wishlist Link */}
             <button
               onClick={onOpenWishlist}
-              className="flex items-center gap-1.5 transition-colors relative group text-text hover:text-primary"
+              className="relative cursor-none"
+              style={{ color: wishlist.length > 0 ? 'var(--gold)' : 'var(--muted)' }}
               title="Saved Items"
             >
-              <Heart size={20} className={wishlist.length > 0 ? "fill-accent text-accent" : ""} />
-              {wishlist.length > 0 && <span className="font-medium text-primary">{wishlist.length}</span>}
-              <span className="sr-only">Wishlist</span>
+              <Heart
+                size={20}
+                className={wishlist.length > 0 ? 'fill-current' : ''}
+              />
+              {wishlist.length > 0 && (
+                <span
+                  className="absolute -top-2 -right-2 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold"
+                  style={{ background: 'var(--gold)', color: '#0C0A08' }}
+                >
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={openWA}
+              className="wa-btn-wrap cursor-none"
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '10px',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'var(--wa)',
+              }}
+            >
+              <span className="wa-dot"></span>
+              WhatsApp
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center gap-4">
             <button
               onClick={onOpenWishlist}
-              className="text-text hover:text-primary relative"
+              className="cursor-none"
+              style={{ color: wishlist.length > 0 ? 'var(--gold)' : 'var(--muted)' }}
             >
-              <Heart size={24} className={wishlist.length > 0 ? "fill-accent text-accent" : ""} />
+              <Heart size={22} className={wishlist.length > 0 ? 'fill-current' : ''} />
               {wishlist.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                <span
+                  className="absolute -top-1 -right-1 text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold"
+                  style={{ background: 'var(--gold)', color: '#0C0A08' }}
+                >
                   {wishlist.length}
                 </span>
               )}
             </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-text hover:text-primary transition-colors focus:outline-none"
+              className="cursor-none"
+              style={{ color: 'var(--muted)' }}
             >
-              {isOpen ? <X size={28} /> : <Menu size={28} />}
+              {isOpen ? <X size={26} /> : <Menu size={26} />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Mobile Dropdown */}
       {isOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-surface shadow-md border-t border-border animate-fade-in">
-          <div className="px-4 pt-2 pb-6 space-y-2">
-            {['Mens Shirts', 'Ladies Suits', 'Kids Boys'].map(cat => (
-               <button
-                 key={cat}
-                 onClick={() => { handleCategoryClick(cat); setIsOpen(false); }}
-                 className="block w-full text-left text-lg py-3 border-b border-border/50 text-text hover:text-primary font-medium"
-               >
-                 {cat.split(' ')[0]} Collection
-               </button>
+        <div
+          className="md:hidden absolute top-full left-0 w-full animate-fade-in"
+          style={{
+            background: 'rgba(12,10,8,0.98)',
+            borderBottom: '1px solid var(--border)',
+          }}
+        >
+          <div className="px-6 py-6 space-y-1">
+            {GROOM_CATS.slice(0, 4).map(cat => (
+              <button
+                key={cat}
+                onClick={() => { navigate(`/catalog?category=${cat}`); setIsOpen(false); }}
+                className="block w-full text-left py-3 border-b cursor-none"
+                style={{
+                  borderColor: 'var(--border)',
+                  color: 'var(--muted)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '11px',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {cat}
+              </button>
             ))}
-            {navLinks.map((link) => (
+            {navLinks.map(link => (
               <Link
                 key={link.name}
                 to={link.path}
                 onClick={() => setIsOpen(false)}
-                className={`block w-full text-left text-lg py-3 border-b border-border/50 ${
-                  location.pathname === link.path ? 'text-primary font-medium' : 'text-text'
-                }`}
+                className="block w-full text-left py-3 border-b cursor-none"
+                style={{
+                  borderColor: 'var(--border)',
+                  color: location.pathname === link.path ? 'var(--gold)' : 'var(--cream)',
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '11px',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                }}
               >
                 {link.name}
               </Link>

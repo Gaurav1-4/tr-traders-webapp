@@ -1,81 +1,72 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Home, Search, Heart, MessageCircle } from 'lucide-react';
-import { useWishlist } from '../hooks/useWishlist'; // Will create this later
+import { useWishlist } from '../hooks/useWishlist';
 
 const MobileNav = () => {
   const location = useLocation();
   const { wishlist } = useWishlist();
 
-  // Hide on admin routes
-  if (location.pathname.startsWith('/admin')) {
-    return null;
-  }
+  if (location.pathname.startsWith('/admin')) return null;
 
   const navItems = [
-    { name: 'Home', path: '/', action: 'home', icon: Home },
-    { name: 'Catalogue', path: '/catalog', action: 'catalog', icon: Search },
-    { 
-      name: 'Saved', 
-      path: '#', // Handled via modal or page
-      icon: Heart, 
-      action: 'wishlist' 
-    },
-    { 
-      name: 'WhatsApp', 
-      path: 'whatsapp', 
-      icon: MessageCircle,
-      action: 'whatsapp'
-    }
+    { name: 'Home', path: '/', icon: Home, action: 'home' },
+    { name: 'Catalogue', path: '/catalog', icon: Search, action: 'catalog' },
+    { name: 'Saved', path: '#', icon: Heart, action: 'wishlist' },
+    { name: 'WhatsApp', path: 'whatsapp', icon: MessageCircle, action: 'whatsapp' },
   ];
 
   return (
     <>
-      {/* Spacer for bottom nav */}
-      <div className="h-16 md:hidden"></div>
-      
-      <div className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-border shadow-[0_-4px_20px_rgba(0,0,0,0.06)] md:hidden z-50 flex justify-around items-center px-2">
+      <div className="h-16 md:hidden" />
+      <div
+        className="fixed bottom-0 left-0 right-0 h-16 md:hidden z-50 flex justify-around items-center px-2"
+        style={{
+          background: 'rgba(12,10,8,0.95)',
+          backdropFilter: 'blur(12px)',
+          borderTop: '1px solid var(--border)',
+        }}
+      >
         {navItems.map((item) => {
           const isActive = location.pathname === item.path && item.action !== 'wishlist' && item.action !== 'whatsapp';
           const Icon = item.icon;
-          
+
           return (
             <button
               key={item.name}
               onClick={() => {
                 if (item.action === 'whatsapp') {
-                  window.open(`https://wa.me/919555835833?text=${encodeURIComponent('Hello! I visited SHRI VRINDAVAN GARMENTS website and would like to know more about your collection.')}`, "_blank");
+                  window.open(`https://wa.me/919555835833?text=${encodeURIComponent('Hello SVG! I want to enquire about groom wear collection.')}`, '_blank');
                 } else if (item.action === 'wishlist') {
-                  // Dispatch custom event to open wishlist modal
                   window.dispatchEvent(new Event('openWishlist'));
                 } else if (item.action === 'home') {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   if (location.pathname !== '/') window.location.href = '/';
                 } else {
-                  if (location.pathname !== item.path) {
-                    window.location.href = item.path;
-                  } else {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }
+                  if (location.pathname !== item.path) window.location.href = item.path;
+                  else window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className={`flex flex-col items-center justify-center w-full h-full relative transition-colors duration-300 ${
-                isActive ? 'text-accent' : 'text-muted hover:text-text'
-              }`}
+              className="flex flex-col items-center justify-center w-full h-full relative"
+              style={{ color: isActive ? 'var(--gold)' : 'var(--muted)', transition: 'color 0.2s' }}
             >
               {isActive && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-accent rounded-b-md"></span>
+                <span
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-b"
+                  style={{ background: 'var(--gold)' }}
+                />
               )}
-              
               <div className="relative">
-                <Icon size={22} className={isActive ? 'fill-accent/10' : ''} />
+                <Icon size={20} />
                 {item.action === 'wishlist' && wishlist.length > 0 && (
-                  <span className="absolute -top-1 -right-2 bg-accent text-white text-[10px] min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 font-medium">
+                  <span
+                    className="absolute -top-1 -right-2 text-[9px] min-w-[14px] h-3.5 flex items-center justify-center rounded-full px-0.5 font-bold"
+                    style={{ background: 'var(--gold)', color: '#0C0A08' }}
+                  >
                     {wishlist.length}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] font-medium mt-1 tracking-wide">{item.name}</span>
+              <span className="text-[9px] mt-1 tracking-wide uppercase">{item.name}</span>
             </button>
           );
         })}

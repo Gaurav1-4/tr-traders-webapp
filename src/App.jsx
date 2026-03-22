@@ -25,10 +25,54 @@ const UserLayout = () => {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
 
   useEffect(() => {
-    // Listen for custom event from MobileNav to open wishlist
     const handleOpenWishlist = () => setIsWishlistOpen(true);
     window.addEventListener('openWishlist', handleOpenWishlist);
     return () => window.removeEventListener('openWishlist', handleOpenWishlist);
+  }, []);
+
+  // Custom gold cursor
+  useEffect(() => {
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    if (!cursor || !ring) return;
+
+    let ringX = 0, ringY = 0;
+    let rafId;
+
+    const moveCursor = (e) => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+      setTimeout(() => {
+        ring.style.left = e.clientX + 'px';
+        ring.style.top = e.clientY + 'px';
+      }, 80);
+    };
+
+    const addHover = (e) => {
+      const el = e.target;
+      if (el.closest('button, a, [role="button"], .fchip, .svg-card, .hcard')) {
+        cursor.classList.add('hovered');
+        ring.classList.add('hovered');
+      }
+    };
+
+    const removeHover = (e) => {
+      const el = e.target;
+      if (el.closest('button, a, [role="button"], .fchip, .svg-card, .hcard')) {
+        cursor.classList.remove('hovered');
+        ring.classList.remove('hovered');
+      }
+    };
+
+    document.addEventListener('mousemove', moveCursor, { passive: true });
+    document.addEventListener('mouseover', addHover, { passive: true });
+    document.addEventListener('mouseout', removeHover, { passive: true });
+
+    return () => {
+      document.removeEventListener('mousemove', moveCursor);
+      document.removeEventListener('mouseover', addHover);
+      document.removeEventListener('mouseout', removeHover);
+    };
   }, []);
 
   return (

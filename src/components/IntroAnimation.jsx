@@ -8,12 +8,8 @@ const IntroAnimation = () => {
     if (!hasPlayed) {
       setIsPlaying(true);
       sessionStorage.setItem('svg_intro_shown', 'true');
-      
-      const finishTimer = setTimeout(() => {
-        setIsPlaying(false);
-      }, 1500);
-
-      return () => clearTimeout(finishTimer);
+      const timer = setTimeout(() => setIsPlaying(false), 3800);
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -22,9 +18,9 @@ const IntroAnimation = () => {
   return (
     <div id="introOverlay">
       <div className="intro-content">
-        <div className="intro-logo">SHRI VRINDAVAN GARMENTS</div>
+        <div className="intro-logo">SVG</div>
         <div className="intro-line"></div>
-        <p className="intro-tagline">Readymade Garments · Delhi</p>
+        <p className="intro-tagline">The Groom's House · Delhi</p>
       </div>
     </div>
   );

@@ -1,45 +1,43 @@
-import { useState, useEffect } from 'react';
-import { MessageCircle } from 'lucide-react';
-
-const WhatsAppButton = ({ 
-  productName = '', 
-  customMessage = '',
-  className = ''
+const WhatsAppButton = ({
+  productName = '',
+  className = '',
+  message = '',
+  label = 'Enquire on WhatsApp',
 }) => {
-  const [phoneNumber, setPhoneNumber] = useState('919555835833');
+  const defaultMsg = productName
+    ? `Hi SVG! I am interested in the ${productName}. Can you share more details?`
+    : message || 'Hello SVG! I want to enquire about groom wear collection.';
 
-  useEffect(() => {
-    const loadSettings = () => {
-      const savedSettings = localStorage.getItem('tr_traders_settings');
-      if (savedSettings) {
-        const parsed = JSON.parse(savedSettings);
-        if (parsed.whatsappNumber) setPhoneNumber(parsed.whatsappNumber);
-      }
-    };
-    loadSettings();
-    window.addEventListener('settingsUpdated', loadSettings);
-    return () => window.removeEventListener('settingsUpdated', loadSettings);
-  }, []);
-  
-  const generateWhatsAppLink = () => {
-    const defaultMessage = productName 
-      ? `Hi SVG! I am interested in the ${productName}. Can you please share availability and best price?`
-      : 'Hello! I visited SHRI VRINDAVAN GARMENTS website and would like to know more about your collection.';
-    
-    const message = customMessage || defaultMessage;
-    return `https://wa.me/919555835833?text=${encodeURIComponent(message)}`;
-  };
+  const openWA = () =>
+    window.open(
+      `https://wa.me/919555835833?text=${encodeURIComponent(defaultMsg)}`,
+      '_blank'
+    );
 
   return (
-    <a
-      href={generateWhatsAppLink()}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`inline-flex items-center justify-center gap-2 bg-whatsapp text-white px-6 py-3 rounded-md font-medium shadow-md hover:bg-green-600 transition-colors animate-pulse-soft ${className}`}
+    <button
+      onClick={openWA}
+      className={`wa-btn-wrap cursor-none ${className}`}
+      style={{
+        background: 'var(--wa)',
+        color: '#fff',
+        border: 'none',
+        padding: '10px 20px',
+        fontFamily: 'var(--font-body)',
+        fontSize: '10px',
+        letterSpacing: '0.2em',
+        textTransform: 'uppercase',
+        fontWeight: '600',
+        cursor: 'pointer',
+        clipPath: 'polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '8px',
+      }}
     >
-      <MessageCircle size={20} className="text-white" />
-      <span>Enquire on WhatsApp</span>
-    </a>
+      <span className="wa-dot"></span>
+      {label}
+    </button>
   );
 };
 

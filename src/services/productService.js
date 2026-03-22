@@ -1,214 +1,245 @@
 import { isMockMode, db } from './firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 
-// Mock data for initial review (Phase 2 upgrades)
+// ─── Groom's House Mock Catalog ─────────────────────────────────────────────
 const mockProducts = [
   {
     id: 'svg1',
-    name: 'Classic White Linen Mens Shirt',
-    category: 'Mens Shirts',
-    fabric: 'Linen',
-    occasions: ['Formal', 'Casual'],
-    description: 'A breathable classic white linen shirt for men. Perfect for summer days and evening resort wear.',
-    price: 850,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['White', 'Navy'],
+    name: 'Royal Banarasi Sherwani',
+    category: 'Sherwani',
+    fabric: 'Banarasi Silk',
+    occasions: ['Wedding', 'Baraat'],
+    description: 'Opulent Banarasi silk sherwani with intricate zari weaving and gold threadwork. The epitome of regal bridal wear — crafted for the groom who wants to command every room.',
+    price: 12999,
+    sizes: ['38','40','42','44','46'],
+    colors: ['Ivory Gold','Champagne','Shahi Maroon'],
     stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1596455607563-ad6193f76b17?w=600&q=80'],
+    images: ['https://images.unsplash.com/photo-1583391733981-8498408ee4b6?w=600&q=80'],
     status: 'active',
     isNew: true,
+    featured: true,
+    emoji: '🥻',
     createdAt: new Date().toISOString()
   },
   {
     id: 'svg2',
-    name: 'Groomsmen Special Silk Blend Kurta Set',
-    category: 'Mens Kurta',
-    fabric: 'Silk Blend',
-    occasions: ['Wedding', 'Party'],
-    description: 'Elegant silk blend kurta set with subtle zari work on the collar. Paired with comfortable churidar.',
-    price: 1850,
-    sizes: ['M', 'L', 'XL', 'XXL'],
-    colors: ['Mustard', 'Ivory', 'Emerald'],
+    name: 'Classic Ivory Sherwani',
+    category: 'Sherwani',
+    fabric: 'Art Silk',
+    occasions: ['Wedding', 'Reception'],
+    description: 'Timeless ivory sherwani with subtle embroidery on collar and cuffs. Clean, elegant, and eternally stylish. Comes with matching churidar and dupatta.',
+    price: 8499,
+    sizes: ['38','40','42','44','46','48'],
+    colors: ['Pure Ivory','Off White','Pearl'],
     stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1628102491629-77858ab57202?w=600&q=80'],
+    images: ['https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&q=80'],
     status: 'active',
-    featured: true,
-    createdAt: new Date().toISOString()
+    isNew: false,
+    featured: false,
+    emoji: '✨',
+    createdAt: new Date(Date.now() - 86400000).toISOString()
   },
   {
     id: 'svg3',
-    name: 'Premium Chino Trousers (Olive)',
-    category: 'Mens Trousers',
-    fabric: 'Cotton Blend',
-    occasions: ['Casual', 'Formal'],
-    description: 'Slim-fit cotton chino trousers with a slight stretch for all-day comfort. Available in multiple versatile colors.',
-    price: 950,
-    sizes: ['30', '32', '34', '36', '38'],
-    colors: ['Olive', 'Khaki', 'Navy'],
+    name: 'Jodhpuri Bandhgala Suit',
+    category: 'Jodhpuri',
+    fabric: 'Wool Blend',
+    occasions: ['Reception', 'Sangeet'],
+    description: 'Sharp Jodhpuri bandhgala with mandarin collar and contrast buttons. Indo-Western at its finest — sophisticated, structured, unmistakably royal.',
+    price: 7999,
+    sizes: ['38','40','42','44','46'],
+    colors: ['Midnight Navy','Charcoal','Bottle Green'],
     stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=80'],
+    images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80'],
     status: 'active',
-    createdAt: new Date().toISOString()
+    isNew: true,
+    featured: true,
+    emoji: '🎩',
+    createdAt: new Date(Date.now() - 172800000).toISOString()
   },
   {
     id: 'svg4',
-    name: 'Jaipuri Print Pure Cotton Suit Set',
-    category: 'Ladies Suits',
-    fabric: 'Pure Cotton',
-    occasions: ['Daily', 'Casual'],
-    description: 'Comfortable 3-piece pure cotton suit set featuring authentic Jaipuri block prints and a malmal dupatta.',
-    price: 1250,
-    sizes: ['M', 'L', 'XL', 'XXL'],
-    colors: ['Indigo', 'Crimson'],
+    name: 'Embroidered Nehru Jacket Set',
+    category: 'Nehru Jacket',
+    fabric: 'Brocade',
+    occasions: ['Sangeet', 'Mehndi'],
+    description: 'Ornate brocade Nehru jacket over a plain silk kurta. Perfect for pre-wedding functions — dashing without going full bridal.',
+    price: 4999,
+    sizes: ['S','M','L','XL','XXL'],
+    colors: ['Royal Blue','Burgundy','Forest Green','Copper'],
+    stock: 'in_stock',
+    images: ['https://images.unsplash.com/photo-1626785774625-0b1c2c4eab67?w=600&q=80'],
+    status: 'active',
+    isNew: false,
+    featured: false,
+    emoji: '🧥',
+    createdAt: new Date(Date.now() - 259200000).toISOString()
+  },
+  {
+    id: 'svg5',
+    name: 'Premium Silk Kurta Pajama',
+    category: 'Kurta Pajama',
+    fabric: 'Pure Silk',
+    occasions: ['Mehndi', 'Haldi', 'Casual'],
+    description: 'Luxurious pure silk kurta with subtle self-print and straight-cut pajama. Comfort meets elegance — ideal for daytime wedding functions.',
+    price: 3499,
+    sizes: ['S','M','L','XL','XXL','XXXL'],
+    colors: ['Pastel Pink','Mint Green','Peach','Sky Blue','Butter Yellow'],
+    stock: 'in_stock',
+    images: ['https://images.unsplash.com/photo-1604652716175-25a82e9b9a48?w=600&q=80'],
+    status: 'active',
+    isNew: false,
+    featured: false,
+    emoji: '👘',
+    createdAt: new Date(Date.now() - 345600000).toISOString()
+  },
+  {
+    id: 'svg6',
+    name: 'Indo-Western Velvet Jacket',
+    category: 'Indo-Western',
+    fabric: 'Velvet & Silk',
+    occasions: ['Cocktail', 'Reception'],
+    description: 'Contemporary sherwani-style jacket with a modern silhouette. Velvet lapels, silk body, slim fit. Where tradition meets fashion week.',
+    price: 9999,
+    sizes: ['38','40','42','44','46'],
+    colors: ['Emerald Velvet','Midnight Blue','Deep Burgundy'],
+    stock: 'in_stock',
+    images: ['https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80'],
+    status: 'active',
+    isNew: true,
+    featured: true,
+    emoji: '💎',
+    createdAt: new Date(Date.now() - 432000000).toISOString()
+  },
+  {
+    id: 'svg7',
+    name: 'Traditional Achkan Set',
+    category: 'Achkan',
+    fabric: 'Cotton Silk',
+    occasions: ['All Wedding Functions'],
+    description: 'Traditional achkan with closed neck, knee-length cut and side slits. Full 3-piece set with matching pajama and stole. Regal, versatile, timeless.',
+    price: 6499,
+    sizes: ['38','40','42','44','46','48'],
+    colors: ['Cream','Shahi White','Light Gold'],
+    stock: 'in_stock',
+    images: ['https://images.unsplash.com/photo-1595341595379-cf1cd0ed7ad1?w=600&q=80'],
+    status: 'active',
+    isNew: false,
+    featured: false,
+    emoji: '🏛️',
+    createdAt: new Date(Date.now() - 518400000).toISOString()
+  },
+  {
+    id: 'svg8',
+    name: 'Designer Heavy Sherwani',
+    category: 'Sherwani',
+    fabric: 'Georgette & Net',
+    occasions: ['Baraat', 'Reception'],
+    price: 0,
+    contact: true,
+    description: 'Fully embroidered designer sherwani with heavy stone and sequin work. Matching dupatta and churidar included. Customization available in color and size.',
+    sizes: ['Custom'],
+    colors: ['Custom on Request'],
+    stock: 'in_stock',
+    images: ['https://images.unsplash.com/photo-1583391734000-cb67d17c8c03?w=600&q=80'],
+    status: 'active',
+    isNew: false,
+    featured: false,
+    emoji: '👑',
+    createdAt: new Date(Date.now() - 604800000).toISOString()
+  },
+  {
+    id: 'svg9',
+    name: 'Festive Kurta Churidar',
+    category: 'Kurta Pajama',
+    fabric: 'Cotton Blend',
+    occasions: ['Haldi', 'Mehndi', 'Casual'],
+    description: 'Lightweight festive kurta with churidar and dupatta. Subtle block print with contrast piping. Cool, comfortable, stylish for outdoor functions.',
+    price: 2199,
+    sizes: ['S','M','L','XL','XXL'],
+    colors: ['Saffron','Terracotta','Olive','Mustard'],
+    stock: 'in_stock',
+    images: ['https://images.unsplash.com/photo-1615886753866-39fc9aa6b1d4?w=600&q=80'],
+    status: 'active',
+    isNew: true,
+    featured: false,
+    emoji: '🌿',
+    createdAt: new Date(Date.now() - 691200000).toISOString()
+  },
+  {
+    id: 'svg10',
+    name: 'Luxury 3-Piece Wedding Suit',
+    category: 'Wedding Suit',
+    fabric: 'Italian Wool Blend',
+    occasions: ['Reception', 'Post-Wedding'],
+    description: 'Sharp 3-piece wedding suit in premium Italian wool blend. Slim lapels, structured shoulders, contrast vest. For the groom who carries elegance beyond the wedding day.',
+    price: 15999,
+    sizes: ['38','40','42','44','46'],
+    colors: ['Charcoal Black','Navy Blue','Dark Burgundy'],
+    stock: 'in_stock',
+    images: ['https://images.unsplash.com/photo-1593032465175-481ac7f401a0?w=600&q=80'],
+    status: 'active',
+    isNew: true,
+    featured: true,
+    emoji: '🤵',
+    createdAt: new Date(Date.now() - 777600000).toISOString()
+  },
+  {
+    id: 'svg11',
+    name: 'Bandhgala Ceremonial Coat',
+    category: 'Bandhgala',
+    fabric: 'Dupion Silk',
+    occasions: ['Wedding', 'Formal'],
+    description: 'Elegant bandhgala coat in dupion silk with contrast piping along collar and placket. Worn over kurta for a commanding ceremonial look.',
+    price: 8999,
+    sizes: ['38','40','42','44','46','48'],
+    colors: ['Champagne','Ivory','Pale Gold','Dusty Rose'],
+    stock: 'in_stock',
+    images: ['https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?w=600&q=80'],
+    status: 'active',
+    isNew: false,
+    featured: false,
+    emoji: '🪡',
+    createdAt: new Date(Date.now() - 864000000).toISOString()
+  },
+  {
+    id: 'svg12',
+    name: 'Printed Silk Kurta Set',
+    category: 'Kurta Pajama',
+    fabric: 'Modal Silk',
+    occasions: ['Sangeet', 'Casual'],
+    description: "Vibrant printed modal silk kurta with matching pants. Contemporary patterns, relaxed fit, premium feel. The modern groom's off-duty essential.",
+    price: 1999,
+    sizes: ['S','M','L','XL','XXL'],
+    colors: ['Indigo Print','Rust Print','Teal Print'],
     stock: 'in_stock',
     images: ['https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80'],
     status: 'active',
     isNew: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'svg5',
-    name: 'Designer Party Wear Anarkali Kurti',
-    category: 'Ladies Kurti',
-    fabric: 'Rayon',
-    occasions: ['Party', 'Wedding'],
-    description: 'Floor-length flared Anarkali kurti with heavy gota patti work on the yoke and border.',
-    price: 1650,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['Wine', 'Emerald', 'Mustard'],
-    stock: 'low_stock',
-    images: ['https://images.unsplash.com/photo-1583391733958-d25e07fac0ce?w=600&q=80'],
-    status: 'active',
-    featured: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'svg6',
-    name: 'Boys Festive Waistcoat & Kurta Set',
-    category: 'Kids Boys',
-    fabric: 'Silk Blend',
-    occasions: ['Wedding', 'Festival'],
-    description: 'Cute and comfortable 3-piece traditional set for boys. Includes cotton kurta, pyjama, and a printed silk jacket.',
-    price: 1100,
-    sizes: ['2-3Y', '4-5Y', '6-7Y', '8-9Y'],
-    colors: ['Mustard', 'Navy'],
-    stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1549488344-c1fb6839bb9b?w=600&q=80'],
-    status: 'active',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'svg7',
-    name: 'Girls Sequin Embellished Lehenga Choli',
-    category: 'Kids Girls',
-    fabric: 'Georgette',
-    occasions: ['Wedding', 'Party'],
-    description: 'Lightweight flowy lehenga with sequence work choli, perfect for twirling at family weddings.',
-    price: 1450,
-    sizes: ['3-4Y', '5-6Y', '7-8Y', '9-10Y'],
-    colors: ['Rose Gold', 'Sage'],
-    stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=80'],
-    status: 'active',
-    isNew: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'svg8',
-    name: 'Wholesale: Assorted Mens Check Shirts (Combo of 10)',
-    category: 'Wholesale Lot',
-    fabric: 'Cotton Blend',
-    occasions: ['Wholesale'],
-    description: 'A wholesale bundle of 10 high-quality men\'s casual check shirts in assorted colors and standard size ratios.',
-    price: 4500,
-    sizes: ['Combo'],
-    colors: ['Assorted'],
-    stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600&q=80'],
-    status: 'active',
-    featured: true,
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'svg9',
-    name: 'Wholesale: Daily Wear Cotton Kurtis (Bulk of 20)',
-    category: 'Wholesale Lot',
-    fabric: 'Pure Cotton',
-    occasions: ['Wholesale'],
-    description: 'Fast-moving daily wear cotton kurtis straight from the manufacturer. Pack of 20 pieces in mixed prints.',
-    price: 7000,
-    sizes: ['Combo'],
-    colors: ['Assorted'],
-    stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&q=80'],
-    status: 'active',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'svg10',
-    name: 'Classic Blue Slim Fit Denim',
-    category: 'Mens Trousers',
-    fabric: 'Denim',
-    occasions: ['Casual', 'Daily'],
-    description: 'Everyday classic blue jeans with a comfortable stretch and slim fit construction.',
-    price: 1050,
-    sizes: ['30', '32', '34', '36'],
-    colors: ['Navy', 'Black'],
-    stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1542272604-780c96850d76?w=600&q=80'],
-    status: 'active',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'svg11',
-    name: 'Office Wear Formal Chiffon Saree',
-    category: 'Ladies Suits',
-    fabric: 'Chiffon',
-    occasions: ['Formal', 'Office'],
-    description: 'Lightweight elegant chiffon saree with minimal border work, suitable for formal wear and office settings.',
-    price: 1150,
-    sizes: ['Free Size'],
-    colors: ['Teal', 'Navy'],
-    stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1620862551532-68045fb9fbd8?w=600&q=80'],
-    status: 'active',
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 'svg12',
-    name: 'Boys Graphic Print T-Shirt & Shorts Combo',
-    category: 'Kids Boys',
-    fabric: 'Hosiery',
-    occasions: ['Casual', 'Daily'],
-    description: 'Soft hosiery cotton casual sets for active toddlers. Easy to wash and maintain.',
-    price: 450,
-    sizes: ['2-3Y', '4-5Y', '6-7Y'],
-    colors: ['Multi'],
-    stock: 'in_stock',
-    images: ['https://images.unsplash.com/photo-1519238396081-01f654b9d0b5?w=600&q=80'],
-    status: 'active',
-    isNew: true,
-    createdAt: new Date().toISOString()
+    featured: false,
+    emoji: '🎋',
+    createdAt: new Date(Date.now() - 950400000).toISOString()
   }
 ];
 
+const STORAGE_KEY = 'svg_grooms_products';
+
 const getMockProducts = () => {
   try {
-    const stored = localStorage.getItem('tr_traders_products');
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed)) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
   } catch (e) {
-    console.error("Local storage parse error:", e);
+    console.error('Local storage parse error:', e);
   }
-  
-  localStorage.setItem('tr_traders_products', JSON.stringify(mockProducts));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(mockProducts));
   return mockProducts;
 };
 
 const saveMockProducts = (products) => {
-  localStorage.setItem('tr_traders_products', JSON.stringify(products));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
 };
 
 export const getProducts = async (includeHidden = false) => {
@@ -219,27 +250,20 @@ export const getProducts = async (includeHidden = false) => {
         products = products.filter(p => p.status === 'active');
       }
       resolve(products);
-    }, 800));
+    }, 600));
   }
-  
+
   try {
-    // 5-second timeout for Firebase connection hangs
-    const fetchDocs = getDocs(collection(db, "products"));
+    const fetchDocs = getDocs(collection(db, 'products'));
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase timeout')), 5000));
-    
     const querySnapshot = await Promise.race([fetchDocs, timeout]);
-    
     let products = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    if (!includeHidden) {
-      products = products.filter(p => p.status === 'active');
-    }
+    if (!includeHidden) products = products.filter(p => p.status === 'active');
     return products;
   } catch (error) {
-    console.warn("Firebase fetch failed or timed out. Falling back to mock data.", error);
+    console.warn('Firebase fetch failed, using mock data.', error);
     let products = getMockProducts();
-    if (!includeHidden) {
-      products = products.filter(p => p.status === 'active');
-    }
+    if (!includeHidden) products = products.filter(p => p.status === 'active');
     return products;
   }
 };
@@ -250,27 +274,23 @@ export const getProductById = async (id) => {
       setTimeout(() => {
         const product = getMockProducts().find(p => p.id === id);
         if (product) resolve(product);
-        else reject(new Error("Product not found"));
-      }, 500);
+        else reject(new Error('Product not found'));
+      }, 400);
     });
   }
 
   try {
-    const docRef = doc(db, "products", id);
+    const docRef = doc(db, 'products', id);
     const fetchDoc = getDoc(docRef);
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Firebase timeout')), 5000));
-    
     const docSnap = await Promise.race([fetchDoc, timeout]);
-    if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
-    } else {
-      throw new Error("No such product!");
-    }
+    if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
+    throw new Error('No such product!');
   } catch (error) {
-    console.warn("Firebase fetch failed or timed out. Falling back to mock data.", error);
+    console.warn('Firebase fetch failed, using mock data.', error);
     const product = getMockProducts().find(p => p.id === id);
     if (product) return product;
-    throw new Error("Product not found");
+    throw new Error('Product not found');
   }
 };
 
@@ -279,10 +299,10 @@ export const addProduct = async (productData) => {
     return new Promise(resolve => {
       setTimeout(() => {
         const products = getMockProducts();
-        const newProduct = { ...productData, id: `prod_${Date.now()}`, createdAt: new Date().toISOString() };
+        const newProduct = { ...productData, id: `prod_${Date.now()}`, createdAt: new Date().toISOString(), status: 'active' };
         saveMockProducts([newProduct, ...products]);
         resolve(newProduct);
-      }, 800);
+      }, 600);
     });
   }
 };
@@ -298,9 +318,9 @@ export const updateProduct = async (id, updates) => {
           saveMockProducts(products);
           resolve(products[index]);
         } else {
-          reject(new Error("Product not found"));
+          reject(new Error('Product not found'));
         }
-      }, 500);
+      }, 400);
     });
   }
 };
