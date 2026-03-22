@@ -35,14 +35,10 @@ const Home = () => {
     <div className="flex flex-col min-h-screen">
       {/* 1. Cinematic Luxury Hero Section */}
       <section className="relative min-h-[70vh] md:min-h-screen w-full flex items-center justify-center overflow-hidden bg-black">
-        {/* Background Image & Overlay */}
+        {/* Background Gradient */}
         <div 
-          className="absolute inset-0 bg-cover bg-center md:bg-[center_top] opacity-60 scale-105 animate-[slow-zoom_20s_ease-out_forwards]"
-          style={{ 
-            backgroundImage: `url('https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1600&q=90')` 
-          }}
+          className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#2a131f] via-black to-black opacity-90"
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/70 z-10"></div>
 
         {/* Hero Content */}
         <div className="relative z-20 w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center text-center space-y-6 pt-20">
