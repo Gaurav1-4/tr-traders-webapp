@@ -4,7 +4,7 @@ import { UploadCloud, X, Image as ImageIcon, Tag, DollarSign, Archive, LayoutLis
 import { useToast } from './Toast';
 import { addProduct, updateProduct } from '../services/productService';
 
-const CATEGORIES = ['Casual', 'Formal', 'Bridal', 'Festive', 'Winter', 'Cotton'];
+const CATEGORIES = ['Mens Shirts', 'Mens Trousers', 'Mens Kurta', 'Ladies Suits', 'Ladies Kurti', 'Kids Boys', 'Kids Girls', 'Wholesale Lot'];
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Custom'];
 
 const AdminProductForm = ({ initialData = null, isEdit = false }) => {

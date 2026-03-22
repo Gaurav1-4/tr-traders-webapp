@@ -4,10 +4,10 @@ const IntroAnimation = () => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    const hasPlayed = sessionStorage.getItem('tr_intro_played');
+    const hasPlayed = sessionStorage.getItem('svg_intro_shown');
     if (!hasPlayed) {
       setIsPlaying(true);
-      sessionStorage.setItem('tr_intro_played', 'true');
+      sessionStorage.setItem('svg_intro_shown', 'true');
       
       const finishTimer = setTimeout(() => {
         setIsPlaying(false);
@@ -22,13 +22,9 @@ const IntroAnimation = () => {
   return (
     <div id="introOverlay">
       <div className="intro-content">
-        <img 
-          src="/images/tr-traders-logo.png" 
-          alt="TR TRADERS" 
-          className="intro-logo"
-        />
+        <div className="intro-logo">SHRI VRINDAVAN GARMENTS</div>
         <div className="intro-line"></div>
-        <p className="intro-tagline">Ladies Suits Collection</p>
+        <p className="intro-tagline">Readymade Garments · Delhi</p>
       </div>
     </div>
   );

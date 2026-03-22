@@ -51,12 +51,12 @@ const ProductCard = ({ product }) => {
       </button>
 
       {/* Image Container */}
-      <Link to={`/product/${product.id}`} className="relative aspect-[3/4] overflow-hidden bg-gray-50 block card-img">
+      <Link to={`/product/${product.id}`} className="relative aspect-[3/4] overflow-hidden bg-gray-50 block card-img rounded-t-xl">
         {/* Loading Skeleton */}
         {!imageLoaded && <div className="absolute inset-0 skeleton"></div>}
         
         <img
-          src={product.images[0] || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80'}
+          src={product.images?.[0] || 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&q=80'}
           alt={product.name}
           className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           loading="lazy"
@@ -70,46 +70,44 @@ const ProductCard = ({ product }) => {
         {/* Floating Tags */}
         <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
           {product.status === 'out_of_stock' ? (
-            <span className="bg-white/90 backdrop-blur-md text-red-600 border border-red-100 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> Sold Out
+            <span className="card-tag sale border-none shadow-sm flex items-center w-fit">
+              Sold Out
             </span>
-          ) : product.featured && (
-            <span className="bg-white/90 backdrop-blur-md text-text border border-gray-200 text-[10px] font-bold px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> New Arrival
+          ) : product.isNew && (
+            <span className="card-tag new border-none shadow-sm flex items-center w-fit">
+              New Arrival
             </span>
-          )}
-          {product.fabric && (
-             <span className="bg-black/50 backdrop-blur-md text-white text-[10px] px-3 py-1.5 rounded-full uppercase tracking-widest float-left w-fit border border-white/20">
-               {product.fabric}
-             </span>
           )}
         </div>
       </Link>
 
       {/* Content */}
-      <div className="p-6 flex flex-col flex-grow bg-white">
-        <div className="flex-grow space-y-1.5 text-center px-2">
-          <h3 className="font-serif text-[clamp(1.1rem,2vw,1.25rem)] font-normal text-text leading-snug line-clamp-2">
-            <Link to={`/product/${product.id}`} className="hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-primary rounded">
+      <div className="p-4 flex flex-col flex-grow bg-white z-10 relative">
+        <div className="flex-grow space-y-1 text-center">
+          <div className="text-[10px] uppercase tracking-[0.15em] font-medium text-muted mb-1">{product.category}</div>
+          <h3 className="card-name line-clamp-2">
+            <Link to={`/product/${product.id}`} className="focus-visible:outline-2 focus-visible:outline-primary rounded">
               {product.name}
             </Link>
           </h3>
           
-          <div className="flex flex-col items-center justify-center mt-3 gap-1">
-            <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-gray-400">{product.category}</span>
+          <div className="flex items-center justify-center mt-2">
             {product.price ? (
-              <span className="font-serif text-primary text-xl mt-1">₹{product.price.toLocaleString('en-IN')}</span>
+              <>
+                <span className="card-price">₹{product.price.toLocaleString('en-IN')}</span>
+                <span className="card-wholesale">₹{Math.floor(product.price * 1.5).toLocaleString('en-IN')}</span>
+              </>
             ) : (
-              <span className="italic text-xs text-gray-500 mt-1">Price on Request</span>
+              <span className="italic text-xs text-muted mt-1">Price on Request</span>
             )}
           </div>
         </div>
 
         {/* Action - Hidden until hover */}
-        <div className="mt-0 overflow-hidden max-h-0 group-hover:max-h-14 group-hover:mt-6 transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center justify-center">
+        <div className="mt-0 overflow-hidden max-h-0 group-hover:max-h-14 group-hover:mt-4 transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center justify-center">
           <WhatsAppButton 
             productName={product.name}
-            className="w-full text-[11px] py-3.5 rounded-lg bg-text text-white hover:bg-primary shadow-none tracking-[0.15em] uppercase"
+            className="w-full text-[11px] py-2.5 rounded-lg border-none shadow-none tracking-[0.1em] uppercase"
           />
         </div>
       </div>

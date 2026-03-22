@@ -93,8 +93,8 @@ const ProductDetail = () => {
   const saved = isInWishlist(product.id);
   
   // Generate WhatsApp Message
-  const waMessage = `Hi! I'm interested in the ${product.name} (Code: ${product.id}).\nCan you share more details?`;
-  const waUrl = `https://wa.me/919208275274?text=${encodeURIComponent(waMessage)}`;
+  const waMessage = `Hi SVG! I am interested in the ${product.name} (Size: ${selectedSize || 'Any'}, Color: ${selectedColor || 'Any'}). Can you please share availability and best price?`;
+  const waUrl = `https://wa.me/919555835833?text=${encodeURIComponent(waMessage)}`;
 
   return (
     <div className="min-h-screen bg-bg pt-28 pb-24">
@@ -121,10 +121,10 @@ const ProductDetail = () => {
           <div className="lg:col-span-5 flex flex-col pt-2 lg:pt-0">
             <div className="flex justify-between items-start">
                <div>
-                  <span className="text-xs uppercase tracking-widest text-primary font-bold mb-2 block">
+                  <span className="modal-category block mb-2">
                     {product.category}
                   </span>
-                  <h1 className="text-3xl sm:text-4xl font-serif text-text leading-tight mb-2">
+                  <h1 className="modal-name leading-tight mb-2">
                     {product.name}
                   </h1>
                </div>
@@ -146,9 +146,14 @@ const ProductDetail = () => {
               <span className="text-sm text-muted hidden sm:inline">4.8 (24 reviews)</span>
             </div>
 
-            <p className="text-2xl font-serif text-text mb-8 border-b border-border pb-6">
-              {product.price ? `₹${product.price.toLocaleString('en-IN')}` : 'Price on Request'}
-            </p>
+            <div className="mb-6 border-b border-border pb-6">
+              <p className="modal-price">
+                {product.price ? `₹${product.price.toLocaleString('en-IN')}` : 'Price on Request'}
+              </p>
+              {product.price && (
+                <p className="modal-wholesale-note">Retail price shown. Contact us for bulk wholesale rates.</p>
+              )}
+            </div>
 
             {/* Fabric & Highlights */}
             <div className="flex flex-wrap gap-2 mb-6">
@@ -186,8 +191,8 @@ const ProductDetail = () => {
                       <button 
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`min-w-[48px] h-10 px-4 rounded border transition-colors uppercase text-sm font-medium ${
-                          selectedSize === size ? 'bg-accent text-white border-accent' : 'bg-surface border-border hover:border-black text-text'
+                        className={`min-w-[48px] h-10 px-4 rounded border transition-colors uppercase text-sm font-medium size-pill ${
+                          selectedSize === size ? 'active' : 'bg-surface border-border hover:border-black text-text'
                         }`}
                       >
                         {size}

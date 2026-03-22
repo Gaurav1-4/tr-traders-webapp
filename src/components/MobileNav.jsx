@@ -13,8 +13,8 @@ const MobileNav = () => {
   }
 
   const navItems = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Search', path: '/catalog', icon: Search },
+    { name: 'Home', path: '/', action: 'home', icon: Home },
+    { name: 'Catalogue', path: '/catalog', action: 'catalog', icon: Search },
     { 
       name: 'Saved', 
       path: '#', // Handled via modal or page
@@ -44,10 +44,13 @@ const MobileNav = () => {
               key={item.name}
               onClick={() => {
                 if (item.action === 'whatsapp') {
-                  window.open("https://wa.me/919208275274?text=Hi!%20I'm%20exploring%20your%20collection.", "_blank");
+                  window.open(`https://wa.me/919555835833?text=${encodeURIComponent('Hello! I visited SHRI VRINDAVAN GARMENTS website and would like to know more about your collection.')}`, "_blank");
                 } else if (item.action === 'wishlist') {
                   // Dispatch custom event to open wishlist modal
                   window.dispatchEvent(new Event('openWishlist'));
+                } else if (item.action === 'home') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  if (location.pathname !== '/') window.location.href = '/';
                 } else {
                   if (location.pathname !== item.path) {
                     window.location.href = item.path;

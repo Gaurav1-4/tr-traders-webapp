@@ -194,7 +194,7 @@ const AdminDashboard = () => {
             <div className="space-y-3">
               <Link to="/admin/products" className="flex items-center justify-between p-3 rounded-lg border border-transparent hover:border-border hover:bg-gray-50 group transition-all">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-50 text-blue-600 p-2 rounded-md group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  <div className="bg-primary/10 text-primary p-2 rounded-md group-hover:bg-primary group-hover:text-white transition-colors">
                     <Package size={18} />
                   </div>
                   <span className="text-sm font-medium text-text">Manage Inventory</span>
@@ -203,7 +203,7 @@ const AdminDashboard = () => {
               </Link>
               <Link to="/admin/enquiries" className="flex items-center justify-between p-3 rounded-lg border border-transparent hover:border-border hover:bg-gray-50 group transition-all">
                 <div className="flex items-center gap-3">
-                  <div className="bg-purple-50 text-purple-600 p-2 rounded-md group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                  <div className="bg-accent/10 text-accent p-2 rounded-md group-hover:bg-accent group-hover:text-white transition-colors">
                     <MessageCircle size={18} />
                   </div>
                   <span className="text-sm font-medium text-text">View Enquiries</span>

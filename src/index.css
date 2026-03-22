@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,14 +6,19 @@
 
 @layer base {
   :root {
-    --color-bg: #FAF7F4;
+    --color-bg: #F5F7FA;
     --color-surface: #FFFFFF;
-    --color-primary: #D4AF37;
-    --color-accent: #1E3A8A;
-    --color-text: #1C1C1C;
-    --color-muted: #7A7A7A;
-    --color-border: #E8E0D8;
-    --color-whatsapp: #25D366;
+    --color-primary: #1A6B3C;
+    --color-accent: #E8A020;
+    --color-accent-dark: #C47E10;
+    --color-text: #1A1A2E;
+    --color-muted: #6B7280;
+    --color-border: #E2E8F0;
+    --color-wa: #25D366;
+    --color-highlight: #FFF8E7;
+    --color-badge: #DC2626;
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
   }
 
   html {
@@ -21,11 +26,13 @@
   }
 
   body {
-    @apply bg-bg text-text font-sans antialiased;
+    @apply bg-bg text-text antialiased;
+    font-family: var(--font-body);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif font-medium;
+    @apply font-medium;
+    font-family: var(--font-display);
   }
 }
 
@@ -102,41 +109,10 @@
   transform: translateY(0);
 }
 
-/* Brand Logo Integrations */
-.nav-logo {
-  height: 44px;
-  width: 44px;
-  object-fit: contain;
-  padding: 4px;
-  background-color: #0D1B38;
-  border-radius: 8px;
-  display: block;
-  transition: transform 0.2s ease;
-}
-.brand-logo-link:hover .nav-logo {
-  transform: scale(1.05);
-}
-
-.hero-logo-wrap {
-  margin-bottom: 1.5rem;
-  animation: fadeUp 0.4s ease both;
-  animation-delay: 0s;
-}
-.hero-logo {
-  height: 80px;
-  width: 80px;
-  object-fit: contain;
-  padding: 6px;
-  background-color: #0D1B38;
-  border-radius: 12px;
-  border: 1px solid rgba(194, 149, 108, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
 #introOverlay {
   position: fixed;
   inset: 0;
-  background: #0D1B38;
+  background: #0F2D1A;
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -148,24 +124,22 @@
   0%   { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-100%); pointer-events: none; }
 }
+
 .intro-logo {
-  width: 160px;
-  height: 200px;
-  object-fit: contain;
-  padding: 12px;
-  background-color: #0D1B38;
-  border-radius: 16px;
-  animation: logoReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.05em;
+  text-align: center;
+  animation: fadeUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   animation-delay: 0.3s;
 }
-@keyframes logoReveal {
-  from { opacity: 0; transform: scale(0.8); }
-  to   { opacity: 1; transform: scale(1); }
-}
+
 .intro-line {
   width: 0;
-  height: 1px;
-  background: #C2956C;
+  height: 2px;
+  background: var(--color-accent);
   margin: 1.2rem auto;
   animation: lineGrow 0.5s ease forwards;
   animation-delay: 1s;
@@ -174,12 +148,13 @@
   to { width: 120px; }
 }
 .intro-tagline {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.3em;
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.7);
   opacity: 0;
+  text-align: center;
   animation: fadeIn 0.4s ease forwards;
   animation-delay: 1.3s;
 }
@@ -187,41 +162,302 @@
   to { opacity: 1; }
 }
 
-.login-logo {
-  width: 72px;
-  height: 90px;
-  object-fit: contain;
-  padding: 6px;
-  background-color: #0D1B38;
+/* Nav Styles */
+.brand-area { display: flex; align-items: center; gap: 12px; }
+.brand-monogram {
+  width: 44px;
+  height: 44px;
+  background: var(--color-primary);
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
   border-radius: 10px;
-  display: block;
-  margin: 0 auto 1.5rem;
-}
-
-.footer-brand-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 1rem;
-}
-.footer-logo {
-  width: 52px;
-  height: 64px;
-  object-fit: contain;
-  padding: 4px;
-  background-color: #0D1B38;
-  border-radius: 8px;
-  border: 1px solid rgba(194, 149, 108, 0.3);
+  justify-content: center;
+  letter-spacing: 1px;
   flex-shrink: 0;
 }
-.footer-brand-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem;
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.brand-sub {
+  font-size: 10px;
+  color: var(--color-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-cats button {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.nav-cats button:hover {
+  background: var(--color-highlight);
+  color: var(--color-primary);
+}
+
+/* Card: clean white with green accent on hover */
+.card {
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(26, 107, 60, 0.12);
+  border-color: rgba(26, 107, 60, 0.3);
+}
+
+/* Bottom accent bar on hover: green instead of rose gold */
+.card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--color-primary);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+.card:hover::after {
+  transform: scaleX(1);
+}
+
+/* Category tag: green */
+.card-tag {
+  background: var(--color-primary);
   color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 99px;
+  text-transform: uppercase;
   letter-spacing: 0.1em;
 }
-.footer-tagline {
-  font-size: 12px;
-  color: rgba(255,255,255,0.45);
-  margin-top: 2px;
+
+/* New badge: saffron/gold */
+.card-tag.new {
+  background: var(--color-accent);
+  color: #1A1A2E;
 }
+
+/* Hot/Sale badge: red */
+.card-tag.sale {
+  background: var(--color-badge);
+  color: #fff;
+}
+
+/* Card name: Playfair Display */
+.card-name {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 4px;
+}
+
+/* Price: green and bold */
+.card-price {
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* Wholesale price tag addition */
+.card-wholesale {
+  font-size: 11px;
+  color: var(--color-muted);
+  text-decoration: line-through;
+  margin-left: 6px;
+}
+
+/* Modal header accent: green */
+.modal-category {
+  color: var(--color-primary);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Product name: Playfair Display */
+.modal-name {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* Price: green */
+.modal-price {
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  font-size: 2rem;
+}
+
+/* Add wholesale info below price */
+.modal-wholesale-note {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 4px;
+}
+
+/* Size pills: active = green */
+.size-pill.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* Hero Styles */
+.hero-section {
+  background: var(--color-bg);
+  min-height: 90vh;
+}
+
+/* Trust Bar */
+.trust-bar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  padding: 8px 16px;
+  font-size: 11px;
+  color: var(--color-text);
+  font-weight: 500;
+  text-transform: uppercase;
+  flex-wrap: wrap; 
+}
+
+/* Hero Content Box */
+.hero-content {
+  max-width: 800px;
+  margin: 60px auto;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.hero-monogram {
+  width: 60px;
+  height: 60px;
+  background: var(--color-primary);
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+
+.hero-subtitle {
+  color: var(--color-primary);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.hero-desc {
+  font-size: 18px;
+  color: var(--color-muted);
+  max-width: 500px;
+  margin: 0 auto 40px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 60px;
+}
+
+.hero-btn {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.hero-wa-btn {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  padding: 14px 32px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.stats-grid {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 40px;
+  flex-wrap: wrap;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+

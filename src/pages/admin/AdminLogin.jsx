@@ -19,7 +19,7 @@ const AdminLogin = () => {
     e.preventDefault();
     setError('');
     
-    if (password === 'trtraders2025') {
+    if (password === 'svg2025') {
       sessionStorage.setItem('tr_admin', 'true');
       navigate('/admin/dashboard');
     } else {

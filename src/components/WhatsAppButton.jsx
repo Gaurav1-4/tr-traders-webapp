@@ -6,7 +6,7 @@ const WhatsAppButton = ({
   customMessage = '',
   className = ''
 }) => {
-  const [phoneNumber, setPhoneNumber] = useState('919208275274');
+  const [phoneNumber, setPhoneNumber] = useState('919555835833');
 
   useEffect(() => {
     const loadSettings = () => {
@@ -23,11 +23,11 @@ const WhatsAppButton = ({
   
   const generateWhatsAppLink = () => {
     const defaultMessage = productName 
-      ? `Hi, I'm interested in "${productName}". Can you share more details?`
-      : 'Hi, I would like to inquire about a custom order.';
+      ? `Hi SVG! I am interested in the ${productName}. Can you please share availability and best price?`
+      : 'Hello! I visited SHRI VRINDAVAN GARMENTS website and would like to know more about your collection.';
     
     const message = customMessage || defaultMessage;
-    return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/919555835833?text=${encodeURIComponent(message)}`;
   };
 
   return (

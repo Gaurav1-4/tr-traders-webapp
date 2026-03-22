@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { X, SlidersHorizontal } from 'lucide-react';
 
-const CATEGORIES = ['All', 'Casual', 'Formal', 'Bridal', 'Festive', 'Winter', 'Cotton'];
-const FABRICS = ['Cotton', 'Silk', 'Georgette', 'Chiffon', 'Linen', 'Wool', 'Banarasi'];
-const OCCASIONS = ['Casual', 'Wedding', 'Office', 'Festival', 'Daily'];
+const CATEGORIES = ['All', 'Mens Shirts', 'Mens Trousers', 'Mens Kurta', 'Ladies Suits', 'Ladies Kurti', 'Kids Boys', 'Kids Girls', 'Wholesale Lot'];
+const FABRICS = ['Cotton', 'Silk', 'Linen', 'Denim', 'Rayon', 'Blend', 'Hosiery'];
+const OCCASIONS = ['Casual', 'Formal', 'Party', 'Wedding', 'Daily', 'Wholesale'];
 const SORTS = ['Newest First', 'Price Low-High', 'Price High-Low', 'Popular'];
 
 const FilterSidebar = ({ filters, setFilters, isOpen, setIsOpen }) => {
