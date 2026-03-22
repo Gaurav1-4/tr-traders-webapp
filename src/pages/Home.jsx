@@ -38,14 +38,6 @@ const Home = () => {
         {/* Left Side: Typography & CTA */}
         <div className="w-full md:w-5/12 lg:w-1/2 flex flex-col justify-center px-6 md:px-12 lg:px-20 pt-32 pb-16 z-20 bg-bg">
           
-          <div className="mb-10 hero-logo-wrap text-left">
-            <img 
-              src="/images/tr-traders-logo.png" 
-              alt="TR TRADERS Logo" 
-              className="h-14 md:h-16 object-contain"
-            />
-          </div>
-          
           <p 
             className="text-primary tracking-[0.4em] font-sans font-semibold text-[10px] md:text-xs uppercase opacity-0 animate-fade-up mb-6 border-l-2 border-primary pl-4"
             style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}
