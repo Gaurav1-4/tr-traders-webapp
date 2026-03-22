@@ -84,8 +84,8 @@ const Home = () => {
         <div className="w-full md:w-7/12 lg:w-1/2 h-[60vh] md:h-screen relative overflow-hidden group">
           <div className="absolute inset-0 bg-text/10 z-10 transition-opacity duration-700 group-hover:bg-transparent"></div>
           <img 
-            src="https://images.unsplash.com/photo-1584282433555-c49fd0b21e90?w=1200&q=90" 
-            alt="Luxury Ethnic Wear Fabric"
+            src="/images/suit-khatli.jpg" 
+            alt="Beautiful Ethnic Suit"
             className="w-full h-full object-cover object-center scale-100 transition-transform duration-[1.5s] ease-out group-hover:scale-105"
           />
           {/* Subtle artistic framing */}

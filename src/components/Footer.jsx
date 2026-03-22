@@ -93,10 +93,10 @@ const Footer = () => {
               </li>
             </ul>
             <div className="flex gap-4 pt-2">
-              <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all">
+              <a href="https://www.instagram.com/t.r_trader/" target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-primary hover:text-white transition-all">
                 <Instagram size={18} />
               </a>
-              <a href="#" className="p-2 bg-white/5 rounded-full hover:bg-whatsapp hover:text-white transition-all">
+              <a href={`https://wa.me/${settings.whatsappNumber}?text=Hi!%20I'm%20exploring%20your%20site.`} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-full hover:bg-whatsapp hover:text-white transition-all">
                 <MessageCircle size={18} />
               </a>
             </div>
