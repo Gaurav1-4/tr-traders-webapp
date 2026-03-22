@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Package, 
-  ShoppingCart, 
+  MessageCircle, 
   Settings, 
   LogOut, 
   Menu, 
@@ -25,6 +25,7 @@ const AdminLayout = () => {
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: <LayoutDashboard size={20} /> },
     { name: 'Products', path: '/admin/products', icon: <Package size={20} /> },
+    { name: 'Enquiries', path: '/admin/enquiries', icon: <MessageCircle size={20} /> },
     { name: 'Settings', path: '/admin/settings', icon: <Settings size={20} /> },
   ];
 

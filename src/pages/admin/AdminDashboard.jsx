@@ -200,10 +200,10 @@ const AdminDashboard = () => {
                 </div>
                 <ChevronRight size={18} className="text-gray-300 group-hover:text-text transition-colors" />
               </Link>
-              <Link to="/admin/orders" className="flex items-center justify-between p-3 rounded-lg border border-transparent hover:border-border hover:bg-gray-50 group transition-all">
+              <Link to="/admin/enquiries" className="flex items-center justify-between p-3 rounded-lg border border-transparent hover:border-border hover:bg-gray-50 group transition-all">
                 <div className="flex items-center gap-3">
                   <div className="bg-purple-50 text-purple-600 p-2 rounded-md group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                    <ShoppingCart size={18} />
+                    <MessageCircle size={18} />
                   </div>
                   <span className="text-sm font-medium text-text">View Enquiries</span>
                 </div>
