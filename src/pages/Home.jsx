@@ -157,7 +157,7 @@ const Home = () => {
           <div className="w-full md:w-1/2 relative">
             <div className="absolute -top-10 -left-6 text-[8rem] font-serif text-border/40 leading-none select-none z-0">"</div>
             <h2 className="text-[clamp(2.2rem,4vw,3.5rem)] font-serif font-normal text-text leading-[1.15] relative z-10">
-              Trusted by families across the city since 1995.
+              Where timeless tradition meets modern sophistication.
             </h2>
           </div>
           
