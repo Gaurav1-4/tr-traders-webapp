@@ -84,7 +84,7 @@ const Home = () => {
         <div className="w-full md:w-7/12 lg:w-1/2 h-[60vh] md:h-screen relative overflow-hidden group">
           <div className="absolute inset-0 bg-text/10 z-10 transition-opacity duration-700 group-hover:bg-transparent"></div>
           <img 
-            src="/images/suit-khatli.jpg" 
+            src="/images/suit-blue.jpg" 
             alt="Beautiful Ethnic Suit"
             className="w-full h-full object-cover object-center scale-100 transition-transform duration-[1.5s] ease-out group-hover:scale-105"
           />
