@@ -397,8 +397,17 @@ function getPassword(){ return localStorage.getItem(PW_KEY) || DEFAULT_PW; }
 document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 
 function doLogin(){
-  const v = document.getElementById('pwInput').value;
+  const v = document.getElementById('pwInput').value.trim();
   const err = document.getElementById('loginErr');
+  
+  // Emergency Reset Command
+  if (v === 'RESET_SVG') {
+    localStorage.removeItem(PW_KEY);
+    toast('Password reset to default (svg2025)');
+    document.getElementById('pwInput').value = '';
+    return;
+  }
+
   if(v === getPassword()){
     sessionStorage.setItem(AUTH_KEY,'true');
     document.getElementById('loginScreen').style.display='none';
