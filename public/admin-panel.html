@@ -280,10 +280,18 @@ tbody tr:hover .action-btns{opacity:1}
             <div class="field"><label>OR Video 3 URL</label><input type="text" id="v_url3" placeholder="https://…"></div>
           </div>
 
-          <div class="storage-wrap">
-            <div class="storage-text"><span>Local Storage Usage</span><span id="storageVal">0% (0 / 5MB)</span></div>
-            <div class="storage-bar"><div id="storageFill" class="storage-fill" style="width:0%"></div></div>
-            <p style="font-size:9px;color:var(--muted);margin-top:6px">Browser limit is 5MB. Large videos may prevent saving. Pasting URLs is safer for storage.</p>
+          <div class="storage-wrap" style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+            <div class="flex-between mb-2">
+              <span style="font-size:12px;font-weight:600">Storage usage (5MB Limit)</span>
+              <button class="btn-outline" style="padding:4px 10px;font-size:10px;color:var(--red)" onclick="clearLocalMedia()">Clear All Local Videos</button>
+            </div>
+            <div class="storage-bar">
+              <div class="storage-fill" id="storageFill"></div>
+            </div>
+            <div class="flex-between mt-1">
+              <p id="storageVal" style="font-size:10px;color:var(--text2)">0% (0 / 5MB)</p>
+              <p style="font-size:9px;color:var(--muted)">Tip: Use URLs for large videos to save space.</p>
+            </div>
           </div>
         </div>
         <div class="panel-header" style="border-top:1px solid var(--border)"><span class="panel-title">General Settings</span></div>
@@ -730,6 +738,13 @@ function deleteEnquiry(id){
 }
 
 // ─── SETTINGS ────────────────────────────────────────────────────────────────
+function clearLocalMedia() {
+  if(!confirm('This will delete all locally uploaded videos to free up space. Proceed?')) return;
+  localStorage.removeItem(VIDEO_KEY);
+  loadSettings();
+  toast('Local media cleared');
+}
+
 function loadSettings(){
   const s = getSettings();
   document.getElementById('s_storeName').value = s.storeName || '';
@@ -778,8 +793,10 @@ async function saveSettings(){
 
   localStorage.setItem(SETT_KEY, JSON.stringify(s));
 
+  // save videos
   const v = [];
   const currentV = JSON.parse(localStorage.getItem(VIDEO_KEY) || '[]');
+  let sizeEst = 0;
   
   for(let i=1; i<=3; i++) {
     const label = document.getElementById('v_label'+i).value;
@@ -788,6 +805,10 @@ async function saveSettings(){
     
     let finalUrl = urlInp;
     if (fileInp) {
+      if (fileInp.size > 2 * 1024 * 1024) {
+        toast(`Video ${i} too large (>2MB). Please compress it first.`, 'err');
+        return;
+      }
       try {
         finalUrl = await file2Base64(fileInp);
       } catch (e) {
@@ -796,7 +817,15 @@ async function saveSettings(){
     } else if (!urlInp && currentV[i-1]?.url?.startsWith('data:video')) {
       finalUrl = currentV[i-1].url;
     }
+
+    if (finalUrl) sizeEst += finalUrl.length;
     v.push({ url: finalUrl, label: label });
+  }
+
+  // Final check before storage push
+  if (sizeEst > 4.5 * 1024 * 1024) {
+    toast('Total video size exceeds 5MB limit. Please clear some videos.', 'err');
+    return;
   }
   
   try {
@@ -804,7 +833,7 @@ async function saveSettings(){
     toast('Settings saved!');
     updateStorageIndicator();
   } catch (e) {
-    toast('STORAGE FULL!', 'err');
+    toast('STORAGE FULL! Try clearing videos first.', 'err');
   }
   
   if (document.getElementById('s_password')) document.getElementById('s_password').value = '';
