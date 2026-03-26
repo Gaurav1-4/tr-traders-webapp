@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SVG Admin Panel — Shri Vrindavan Garments</title>
+<link rel="icon" href="/images/svg-logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0D0D0D;--surface:#141414;--surface2:#1A1A1A;--surface3:#222;
+  --gold:#C9A84C;--gold2:rgba(201,168,76,0.15);--gold3:rgba(201,168,76,0.08);
+  --text:#F5F0E8;--text2:#A0998A;--muted:#5A5550;
+  --border:rgba(255,255,255,0.07);--border2:rgba(201,168,76,0.25);
+  --red:#E05353;--green:#4CAF7A;--amber:#F0A040;
+  --sh:0 4px 24px rgba(0,0,0,0.5);
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;line-height:1.6}
+h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:400}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:'DM Sans',sans-serif}
+input,select,textarea{font-family:'DM Sans',sans-serif}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
+
+/* ── LOGIN ── */
+#loginScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:2rem}
+.login-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border2);padding:3rem;text-align:center;box-shadow:0 0 80px rgba(201,168,76,0.08)}
+.login-logo{width:90px;height:90px;border-radius:50%;object-fit:contain;border:1px solid var(--border2);margin-bottom:1.5rem;box-shadow:0 0 30px rgba(201,168,76,0.1)}
+.login-title{font-size:1.8rem;color:var(--text);margin-bottom:.25rem}
+.login-sub{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:2.5rem}
+.login-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:13px 16px;font-size:14px;outline:none;margin-bottom:1rem;transition:border-color .2s}
+.login-input:focus{border-color:var(--gold)}
+.login-input.shake{animation:shake .4s ease;border-color:var(--red)}
+.login-err{color:var(--red);font-size:12px;margin-bottom:1rem;min-height:18px}
+.login-btn{width:100%;background:var(--gold);color:#0D0D0D;border:none;padding:14px;font-size:11px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;transition:all .2s}
+.login-btn:hover{background:#d4b55a;box-shadow:0 4px 20px rgba(201,168,76,0.3)}
+
+/* ── LAYOUT ── */
+#app{display:none;flex-direction:row;min-height:100vh}
+#app.visible{display:flex}
+aside{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;inset-y:0;left:0;z-index:50}
+.aside-logo{padding:1.5rem 1.5rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.aside-logo img{width:40px;height:40px;border-radius:50%;object-fit:contain}
+.aside-brand{font-family:'Cormorant Garamond',serif;font-size:.9rem;font-weight:600;letter-spacing:.08em;line-height:1.2}
+.aside-brand span{display:block;font-family:'DM Sans',sans-serif;font-size:9px;color:var(--gold);letter-spacing:.2em;text-transform:uppercase;margin-top:2px}
+nav.aside-nav{flex:1;padding:1rem 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 1.5rem;font-size:12px;letter-spacing:.08em;color:var(--text2);transition:all .2s;cursor:pointer;border-left:2px solid transparent}
+.nav-item:hover{background:var(--gold3);color:var(--text)}
+.nav-item.active{background:var(--gold2);color:var(--gold);border-left-color:var(--gold)}
+.nav-item svg{flex-shrink:0}
+.aside-footer{padding:1rem 1.5rem;border-top:1px solid var(--border)}
+.logout-btn{width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:none;border:1px solid rgba(224,83,83,0.25);color:var(--red);font-size:11px;letter-spacing:.15em;text-transform:uppercase;transition:all .2s}
+.logout-btn:hover{background:rgba(224,83,83,0.1)}
+
+main#content{flex:1;margin-left:240px;overflow-y:auto;min-height:100vh}
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:40}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem}
+.topbar-badge{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:var(--gold2);padding:4px 12px}
+.page{display:none;padding:2rem}
+.page.active{display:block}
+
+/* ── CARDS / STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+@media(max-width:900px){.stats-grid{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--surface);border:1px solid var(--border);padding:1.5rem;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-card:hover{border-color:var(--border2)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.stat-card.gold::before{background:var(--gold)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.amber::before{background:var(--amber)}
+.stat-card.red::before{background:var(--red)}
+.stat-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--text2);margin-bottom:.5rem}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:2.5rem;color:var(--text);line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:.5rem}
+
+/* ── TABLE ── */
+.panel{background:var(--surface);border:1px solid var(--border)}
+.panel-header{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.panel-title{font-size:1rem;font-family:'Cormorant Garamond',serif}
+.toolbar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.search-w{position:relative}
+.search-w input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px 8px 34px;font-size:12px;outline:none;width:220px;transition:border-color .2s}
+.search-w input:focus{border-color:var(--border2)}
+.search-w svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.4}
+.sel{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;font-size:12px;outline:none;cursor:pointer}
+.btn-gold{background:var(--gold);color:#0D0D0D;border:none;padding:9px 18px;font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;transition:all .2s}
+.btn-gold:hover{background:#d4b55a}
+.btn-outline{background:none;border:1px solid var(--border2);color:var(--gold);padding:8px 16px;font-size:10px;letter-spacing:.15em;text-transform:uppercase;transition:all .2s}
+.btn-outline:hover{background:var(--gold2)}
+.btn-danger{background:none;border:1px solid rgba(224,83,83,0.3);color:var(--red);padding:6px 12px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;transition:all .2s}
+.btn-danger:hover{background:rgba(224,83,83,0.15)}
+
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--border)}
+th{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);padding:10px 1rem;text-align:left;font-weight:500}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:hover{background:var(--gold3)}
+tbody tr:last-child{border-bottom:none}
+td{padding:12px 1rem;font-size:13px;vertical-align:middle}
+.badge{display:inline-block;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px}
+.badge-active{background:rgba(76,175,122,0.15);color:var(--green);border:1px solid rgba(76,175,122,0.3)}
+.badge-hidden{background:rgba(90,85,80,0.3);color:var(--muted);border:1px solid var(--border)}
+.badge-pending{background:rgba(240,160,64,0.15);color:var(--amber);border:1px solid rgba(240,160,64,0.25)}
+.badge-resolved{background:rgba(76,175,122,0.15);color:var(--green);border:1px solid rgba(76,175,122,0.25)}
+.prod-thumb{width:44px;height:56px;object-fit:cover;background:var(--surface2)}
+.action-btns{display:flex;gap:.4rem;opacity:0;transition:opacity .15s}
+tbody tr:hover .action-btns{opacity:1}
+.icon-btn{background:none;border:1px solid var(--border);color:var(--text2);width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
+.icon-btn.del:hover{border-color:var(--red);color:var(--red)}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;animation:modalIn .3s ease}
+.modal-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-size:1.2rem}
+.modal-close{background:none;border:none;color:var(--text2);font-size:1.5rem;line-height:1;padding:0 4px;transition:color .15s}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:1.5rem}
+.modal-foot{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.75rem;justify-content:flex-end}
+
+/* ── FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--text2)}
+.field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;font-size:13px;outline:none;transition:border-color .2s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--border2)}
+.field select option{background:var(--surface2)}
+.field textarea{resize:vertical;min-height:80px}
+
+/* ── TOAST ── */
+#toastWrap{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;pointer-events:none}
+.toast{background:var(--surface);border-left:3px solid var(--gold);color:var(--text);padding:12px 20px;font-size:12px;box-shadow:var(--sh);animation:toastIn .3s ease;min-width:200px}
+.toast.err{border-left-color:var(--red)}
+
+/* ── ANIMATIONS ── */
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <img src="/images/svg-logo.png" class="login-logo" alt="SVG">
+    <h2 class="login-title">Admin Portal</h2>
+    <p class="login-sub">Shri Vrindavan Garments</p>
+    <input id="pwInput" type="password" class="login-input" placeholder="Enter access password…">
+    <p id="loginErr" class="login-err"></p>
+    <button class="login-btn" onclick="doLogin()">Enter Portal</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside>
+    <div class="aside-logo">
+      <img src="/images/svg-logo.png" alt="SVG">
+      <div class="aside-brand">SVG Admin<span>Control Panel</span></div>
+    </div>
+    <nav class="aside-nav">
+      <div class="nav-item active" onclick="showPage('dashboard',this)">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('products',this)">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M20 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Z"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        Products
+      </div>
+      <div class="nav-item" onclick="showPage('enquiries',this)">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Enquiries
+      </div>
+      <div class="nav-item" onclick="showPage('settings',this)">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </div>
+      <div class="nav-item" onclick="window.open('/','_blank')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        View Store
+      </div>
+    </nav>
+    <div class="aside-footer">
+      <button class="logout-btn" onclick="doLogout()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <main id="content">
+    <div class="topbar">
+      <span class="topbar-title" id="topbarTitle">Dashboard</span>
+      <span class="topbar-badge">SVG Admin</span>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Recent Products</span></div>
+        <table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Status</th></tr></thead>
+        <tbody id="dashRecentBody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div id="page-products" class="page">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">All Products</span>
+          <div class="toolbar">
+            <div class="search-w">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="prodSearch" placeholder="Search…" oninput="renderProducts()">
+            </div>
+            <select class="sel" id="catFilter" onchange="renderProducts()"><option value="">All Categories</option></select>
+            <button class="btn-gold" onclick="openProductModal()">+ Add Product</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody id="prodBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENQUIRIES -->
+    <div id="page-enquiries" class="page">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">WhatsApp Leads</span>
+          <div class="toolbar">
+            <div class="search-w">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="enqSearch" placeholder="Search leads…" oninput="renderEnquiries()">
+            </div>
+            <button class="btn-gold" onclick="openEnqModal()">+ Log Lead</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table><thead><tr><th>Customer</th><th>Product Interest</th><th>Date</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody id="enqBody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="page-settings" class="page">
+      <div class="panel" style="max-width:700px">
+        <div class="panel-header"><span class="panel-title">Store Settings</span></div>
+        <div class="modal-body">
+          <div class="form-grid">
+            <div class="field form-full">
+              <label>Store Name</label>
+              <input type="text" id="s_storeName">
+            </div>
+            <div class="field">
+              <label>WhatsApp Number (with country code)</label>
+              <input type="text" id="s_wa" placeholder="e.g. 919876543210">
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" id="s_email">
+            </div>
+            <div class="field form-full">
+              <label>Address</label>
+              <textarea id="s_address" rows="3"></textarea>
+            </div>
+            <div class="field">
+              <label>Admin Password</label>
+              <input type="password" id="s_password" placeholder="Leave blank to keep current">
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn-gold" onclick="saveSettings()">Save Settings</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="overlay" id="prodModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="prodModalTitle">Add Product</h3>
+      <button class="modal-close" onclick="closeProdModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field form-full"><label>Product Name *</label><input type="text" id="f_name" placeholder="e.g. Royal Banarasi Sherwani"></div>
+        <div class="field"><label>Category</label>
+          <select id="f_category">
+            <option>Sherwani</option><option>Kurta Pajama</option><option>Jodhpuri</option>
+            <option>Nehru Jacket</option><option>Achkan</option><option>Bandhgala</option>
+            <option>Indo-Western</option><option>Wedding Suit</option>
+          </select>
+        </div>
+        <div class="field"><label>Fabric *</label><input type="text" id="f_fabric" placeholder="e.g. Banarasi Silk"></div>
+        <div class="field"><label>Price (₹) — leave blank for PoA</label><input type="number" id="f_price" min="0" placeholder="e.g. 8499"></div>
+        <div class="field"><label>Status</label>
+          <select id="f_status"><option value="active">Active</option><option value="hidden">Hidden</option></select>
+        </div>
+        <div class="field form-full"><label>Image URL</label><input type="url" id="f_image" placeholder="https://…"></div>
+        <div class="field form-full"><label>Description</label><textarea id="f_desc" rows="3" placeholder="Describe the product…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeProdModal()">Cancel</button>
+      <button class="btn-gold" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- ENQUIRY MODAL -->
+<div class="overlay" id="enqModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Log WhatsApp Lead</h3>
+      <button class="modal-close" onclick="closeEnqModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>Customer Name *</label><input type="text" id="e_name" placeholder="e.g. Priya Sharma"></div>
+        <div class="field"><label>Phone *</label><input type="text" id="e_phone" placeholder="+91 XXXXX XXXXX"></div>
+        <div class="field form-full"><label>Product of Interest *</label><input type="text" id="e_product" placeholder="e.g. Banarasi Sherwani"></div>
+        <div class="field"><label>Status</label>
+          <select id="e_status"><option value="pending">Pending</option><option value="resolved">Resolved</option></select>
+        </div>
+        <div class="field form-full"><label>Notes</label><textarea id="e_notes" rows="3" placeholder="Custom sizing, payment notes…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeEnqModal()">Cancel</button>
+      <button class="btn-gold" onclick="saveEnquiry()">Save Lead</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toastWrap"></div>
+
+<script>
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const PROD_KEY  = 'svg_grooms_products';
+const ENQ_KEY   = 'tr_traders_enquiries';
+const SETT_KEY  = 'tr_traders_settings';
+const AUTH_KEY  = 'svg_admin_panel_auth';
+const PW_KEY    = 'svg_admin_password';
+const DEFAULT_PW = 'svg2025';
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+function getPassword(){ return localStorage.getItem(PW_KEY) || DEFAULT_PW; }
+
+document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogin(){
+  const v = document.getElementById('pwInput').value;
+  const err = document.getElementById('loginErr');
+  if(v === getPassword()){
+    sessionStorage.setItem(AUTH_KEY,'true');
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').classList.add('visible');
+    initApp();
+  } else {
+    err.textContent='Incorrect password. Try again.';
+    const inp = document.getElementById('pwInput');
+    inp.classList.add('shake');
+    setTimeout(()=>inp.classList.remove('shake'),450);
+  }
+}
+
+function doLogout(){
+  sessionStorage.removeItem(AUTH_KEY);
+  location.reload();
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function initApp(){
+  if(sessionStorage.getItem(AUTH_KEY)!=='true') return;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  renderDashboard();
+  renderProducts();
+  renderEnquiries();
+  loadSettings();
+}
+
+window.addEventListener('load',()=>{
+  if(sessionStorage.getItem(AUTH_KEY)==='true') initApp();
+});
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+const PAGE_TITLES = {dashboard:'Dashboard',products:'Products',enquiries:'WhatsApp Leads',settings:'Settings'};
+
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('topbarTitle').textContent = PAGE_TITLES[id];
+}
+
+// ─── DATA HELPERS ─────────────────────────────────────────────────────────────
+function getProducts(){ try{ return JSON.parse(localStorage.getItem(PROD_KEY))||[]; }catch(e){ return []; } }
+function saveProducts(arr){ localStorage.setItem(PROD_KEY,JSON.stringify(arr)); }
+function getEnquiries(){ try{ return JSON.parse(localStorage.getItem(ENQ_KEY))||[]; }catch(e){ return []; } }
+function saveEnquiries(arr){ localStorage.setItem(ENQ_KEY,JSON.stringify(arr)); }
+function getSettings(){ try{ return JSON.parse(localStorage.getItem(SETT_KEY))||{}; }catch(e){ return {}; } }
+
+// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const prods  = getProducts();
+  const enqs   = getEnquiries();
+  const active = prods.filter(p=>p.status==='active').length;
+  const attn   = prods.filter(p=>p.stock==='low_stock'||p.stock==='out_of_stock').length;
+  const cats   = new Set(prods.map(p=>p.category)).size;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card gold"><div class="stat-label">Total Products</div><div class="stat-num">${prods.length}</div><div class="stat-sub">in catalog</div></div>
+    <div class="stat-card green"><div class="stat-label">Active Listings</div><div class="stat-num">${active}</div><div class="stat-sub">visible to customers</div></div>
+    <div class="stat-card amber"><div class="stat-label">Categories</div><div class="stat-num">${cats}</div><div class="stat-sub">across the store</div></div>
+    <div class="stat-card red"><div class="stat-label">Enquiries</div><div class="stat-num">${enqs.length}</div><div class="stat-sub">${enqs.filter(e=>e.status==='pending').length} pending</div></div>
+  `;
+
+  const recent = [...prods].slice(0,6);
+  document.getElementById('dashRecentBody').innerHTML = recent.map(p=>`
+    <tr>
+      <td style="font-family:'Cormorant Garamond',serif">${p.name}</td>
+      <td style="color:var(--text2);font-size:12px">${p.category||'—'}</td>
+      <td style="font-family:'Cormorant Garamond',serif">${p.price?'₹'+Number(p.price).toLocaleString():'PoA'}</td>
+      <td><span class="badge badge-${p.status||'active'}">${p.status||'active'}</span></td>
+    </tr>
+  `).join('') || '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:2rem">No products yet</td></tr>';
+}
+
+// ─── PRODUCTS ────────────────────────────────────────────────────────────────
+let editingProdId = null;
+
+function renderProducts(){
+  const prods  = getProducts();
+  const q      = (document.getElementById('prodSearch')?.value||'').toLowerCase();
+  const cat    = document.getElementById('catFilter')?.value||'';
+
+  // populate filter
+  const cats = ['', ...new Set(prods.map(p=>p.category).filter(Boolean))];
+  const cf   = document.getElementById('catFilter');
+  if(cf){
+    const cur = cf.value;
+    cf.innerHTML = cats.map(c=>`<option value="${c}">${c||'All Categories'}</option>`).join('');
+    cf.value = cur;
+  }
+
+  const filtered = prods.filter(p=>{
+    const matchQ = !q || p.name?.toLowerCase().includes(q) || p.fabric?.toLowerCase().includes(q);
+    const matchC = !cat || p.category===cat;
+    return matchQ && matchC;
+  });
+
+  document.getElementById('prodBody').innerHTML = filtered.map(p=>`
+    <tr>
+      <td><img class="prod-thumb" src="${p.images?.[0]||p.image||''}" onerror="this.style.display='none'" alt="${p.name}"></td>
+      <td>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1rem">${p.name}</div>
+        <div style="font-size:11px;color:var(--text2)">${p.fabric||''}</div>
+      </td>
+      <td style="font-size:12px">${p.category||'—'}</td>
+      <td style="font-family:'Cormorant Garamond',serif">${p.price?'₹'+Number(p.price).toLocaleString():'<span style="color:var(--muted);font-size:11px;font-style:italic">PoA</span>'}</td>
+      <td><span class="badge badge-${p.status==='active'?'active':'hidden'}">${p.status||'active'}</span></td>
+      <td style="text-align:right">
+        <div class="action-btns">
+          <button class="icon-btn" onclick="toggleStatus('${p.id}')" title="${p.status==='active'?'Hide':'Publish'}">
+            ${p.status==='active'?'<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>':'<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'}
+          </button>
+          <button class="icon-btn" onclick="editProduct('${p.id}')" title="Edit">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="icon-btn del" onclick="deleteProduct('${p.id}')" title="Delete">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:3rem">No products found</td></tr>';
+}
+
+function openProductModal(id){
+  editingProdId = id||null;
+  document.getElementById('prodModalTitle').textContent = id ? 'Edit Product' : 'Add Product';
+  if(id){
+    const p = getProducts().find(x=>x.id===id)||{};
+    document.getElementById('f_name').value     = p.name||'';
+    document.getElementById('f_category').value = p.category||'Sherwani';
+    document.getElementById('f_fabric').value   = p.fabric||'';
+    document.getElementById('f_price').value    = p.price||'';
+    document.getElementById('f_status').value   = p.status||'active';
+    document.getElementById('f_image').value    = (p.images||[])[0]||p.image||'';
+    document.getElementById('f_desc').value     = p.description||'';
+  } else {
+    ['f_name','f_fabric','f_price','f_image','f_desc'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f_status').value='active';
+  }
+  document.getElementById('prodModal').classList.add('open');
+}
+
+function editProduct(id){ openProductModal(id); }
+
+function closeProdModal(){ document.getElementById('prodModal').classList.remove('open'); }
+
+function saveProduct(){
+  const name = document.getElementById('f_name').value.trim();
+  const fabric = document.getElementById('f_fabric').value.trim();
+  if(!name||!fabric){ toast('Name and Fabric are required','err'); return; }
+
+  const data = {
+    name, fabric,
+    category: document.getElementById('f_category').value,
+    price: Number(document.getElementById('f_price').value)||0,
+    status: document.getElementById('f_status').value,
+    images: [document.getElementById('f_image').value].filter(Boolean),
+    description: document.getElementById('f_desc').value.trim(),
+  };
+
+  let prods = getProducts();
+  if(editingProdId){
+    prods = prods.map(p=>p.id===editingProdId?{...p,...data}:p);
+    toast('Product updated!');
+  } else {
+    prods.unshift({...data, id:'prod_'+Date.now(), stock:'in_stock', featured:false, isNew:true, createdAt:new Date().toISOString()});
+    toast('Product added!');
+  }
+  saveProducts(prods);
+  renderProducts();
+  renderDashboard();
+  closeProdModal();
+}
+
+function toggleStatus(id){
+  const prods = getProducts().map(p=>{
+    if(p.id===id) return {...p, status: p.status==='active'?'hidden':'active'};
+    return p;
+  });
+  saveProducts(prods);
+  renderProducts();
+  renderDashboard();
+  toast('Status updated');
+}
+
+function deleteProduct(id){
+  if(!confirm('Delete this product? This cannot be undone.')) return;
+  saveProducts(getProducts().filter(p=>p.id!==id));
+  renderProducts();
+  renderDashboard();
+  toast('Product deleted');
+}
+
+// ─── ENQUIRIES ────────────────────────────────────────────────────────────────
+function renderEnquiries(){
+  const enqs = getEnquiries();
+  const q = (document.getElementById('enqSearch')?.value||'').toLowerCase();
+  const filtered = enqs.filter(e=>!q||e.name?.toLowerCase().includes(q)||e.phone?.includes(q)||e.productOfInterest?.toLowerCase().includes(q));
+
+  document.getElementById('enqBody').innerHTML = filtered.map(e=>`
+    <tr>
+      <td>
+        <div style="font-weight:500">${e.name}</div>
+        <div style="font-size:11px;color:var(--text2)">${e.phone}</div>
+      </td>
+      <td>
+        <div>${e.productOfInterest}</div>
+        ${e.notes?`<div style="font-size:11px;color:var(--muted);font-style:italic">${e.notes}</div>`:''}
+      </td>
+      <td style="font-size:12px;color:var(--text2)">${new Date(e.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td>
+        <button onclick="toggleEnqStatus('${e.id}')" class="badge badge-${e.status}" style="background:none;border:none;cursor:pointer">
+          ${e.status==='resolved'?'✓ Resolved':'⏳ Pending'}
+        </button>
+      </td>
+      <td style="text-align:right">
+        <div class="action-btns">
+          <button class="icon-btn del" onclick="deleteEnquiry('${e.id}')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:3rem">No leads found</td></tr>';
+}
+
+function openEnqModal(){
+  ['e_name','e_phone','e_product','e_notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('e_status').value='pending';
+  document.getElementById('enqModal').classList.add('open');
+}
+
+function closeEnqModal(){ document.getElementById('enqModal').classList.remove('open'); }
+
+function saveEnquiry(){
+  const name = document.getElementById('e_name').value.trim();
+  const phone = document.getElementById('e_phone').value.trim();
+  const product = document.getElementById('e_product').value.trim();
+  if(!name||!phone||!product){ toast('Name, Phone & Product are required','err'); return; }
+  const enqs = getEnquiries();
+  enqs.unshift({ id:Date.now().toString(), name, phone, productOfInterest:product, status:document.getElementById('e_status').value, notes:document.getElementById('e_notes').value.trim(), date:new Date().toISOString() });
+  saveEnquiries(enqs);
+  renderEnquiries();
+  renderDashboard();
+  closeEnqModal();
+  toast('Lead saved!');
+}
+
+function toggleEnqStatus(id){
+  const enqs = getEnquiries().map(e=>e.id===id?{...e,status:e.status==='pending'?'resolved':'pending'}:e);
+  saveEnquiries(enqs);
+  renderEnquiries();
+}
+
+function deleteEnquiry(id){
+  if(!confirm('Delete this lead?')) return;
+  saveEnquiries(getEnquiries().filter(e=>e.id!==id));
+  renderEnquiries();
+  renderDashboard();
+  toast('Lead deleted');
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+function loadSettings(){
+  const s = getSettings();
+  document.getElementById('s_storeName').value = s.storeName||'Shri Vrindavan Garments';
+  document.getElementById('s_wa').value         = s.whatsappNumber||'';
+  document.getElementById('s_email').value      = s.email||'';
+  document.getElementById('s_address').value    = s.address||'';
+  document.getElementById('s_password').value   = '';
+}
+
+function saveSettings(){
+  const s = getSettings();
+  const newPw = document.getElementById('s_password').value;
+  const updated = {
+    ...s,
+    storeName: document.getElementById('s_storeName').value,
+    whatsappNumber: document.getElementById('s_wa').value,
+    email: document.getElementById('s_email').value,
+    address: document.getElementById('s_address').value,
+  };
+  localStorage.setItem(SETT_KEY, JSON.stringify(updated));
+  if(newPw) localStorage.setItem(PW_KEY, newPw);
+  window.dispatchEvent(new Event('settingsUpdated'));
+  toast('Settings saved!');
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+function toast(msg, type=''){
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast'+(type?' '+type:'');
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+</script>
+</body>
+</html>

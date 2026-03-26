@@ -3,12 +3,10 @@ import { ToastProvider } from './components/Toast';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MobileNav from './components/MobileNav';
-import IntroAnimation from './components/IntroAnimation';
 import Home from './pages/Home';
 import About from './pages/About';
 import Catalog from './pages/Catalog';
 import ProductDetail from './pages/ProductDetail';
-import ProtectedRoute from './components/ProtectedRoute';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminProducts from './pages/admin/AdminProducts';
@@ -16,13 +14,15 @@ import AdminProductEdit from './pages/admin/AdminProductEdit';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminEnquiries from './pages/admin/AdminEnquiries';
 import AdminLayout from './components/admin/AdminLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import WishlistModal from './components/WishlistModal';
 
 import './App.css';
 
 const UserLayout = () => {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+  const cursorRef = useRef(null);
+  const ringRef = useRef(null);
 
   useEffect(() => {
     const handleOpenWishlist = () => setIsWishlistOpen(true);
@@ -30,18 +30,16 @@ const UserLayout = () => {
     return () => window.removeEventListener('openWishlist', handleOpenWishlist);
   }, []);
 
-  // Custom gold cursor
+  // Custom gold cursor — uses refs so elements are guaranteed present
   useEffect(() => {
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursor-ring');
+    const cursor = cursorRef.current;
+    const ring = ringRef.current;
     if (!cursor || !ring) return;
-
-    let ringX = 0, ringY = 0;
-    let rafId;
 
     const moveCursor = (e) => {
       cursor.style.left = e.clientX + 'px';
       cursor.style.top = e.clientY + 'px';
+      // Slight delay on the ring for trailing effect
       setTimeout(() => {
         ring.style.left = e.clientX + 'px';
         ring.style.top = e.clientY + 'px';
@@ -49,16 +47,14 @@ const UserLayout = () => {
     };
 
     const addHover = (e) => {
-      const el = e.target;
-      if (el.closest('button, a, [role="button"], .fchip, .svg-card, .hcard')) {
+      if (e.target.closest('button, a, [role="button"], .fchip, .svg-card, .hcard')) {
         cursor.classList.add('hovered');
         ring.classList.add('hovered');
       }
     };
 
     const removeHover = (e) => {
-      const el = e.target;
-      if (el.closest('button, a, [role="button"], .fchip, .svg-card, .hcard')) {
+      if (e.target.closest('button, a, [role="button"], .fchip, .svg-card, .hcard')) {
         cursor.classList.remove('hovered');
         ring.classList.remove('hovered');
       }
@@ -77,7 +73,9 @@ const UserLayout = () => {
 
   return (
     <div className="flex flex-col min-h-screen relative">
-      <IntroAnimation />
+      {/* Custom cursor elements — using refs not getElementById */}
+      <div ref={cursorRef} id="cursor" />
+      <div ref={ringRef} id="cursor-ring" />
       <Navbar onOpenWishlist={() => setIsWishlistOpen(true)} />
       <main className="flex-grow">
         <Outlet />
