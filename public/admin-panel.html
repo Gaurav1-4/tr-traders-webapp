@@ -253,7 +253,21 @@ tbody tr:hover .action-btns{opacity:1}
     <!-- SETTINGS -->
     <div id="page-settings" class="page">
       <div class="panel" style="max-width:700px">
-        <div class="panel-header"><span class="panel-title">Store Settings</span></div>
+        <div class="panel-header"><span class="panel-title">Video Showcase (Hero)</span></div>
+        <div class="modal-body">
+          <p style="font-size:11px;color:var(--muted);margin-bottom:1.5rem">Provide up to 3 video URLs (Direct mp4/webm or YouTube/Instagram links) to display in the home page lookbook.</p>
+          <div class="form-grid">
+            <div class="field form-full"><label>Video 1 URL</label><input type="text" id="v_url1" placeholder="https://…"></div>
+            <div class="field form-full"><label>Video 1 Label</label><input type="text" id="v_label1" placeholder="e.g. Sherwani Collection"></div>
+            
+            <div class="field form-full" style="margin-top:1rem"><label>Video 2 URL</label><input type="text" id="v_url2" placeholder="https://…"></div>
+            <div class="field form-full"><label>Video 2 Label</label><input type="text" id="v_label2" placeholder="e.g. Wedding Suits"></div>
+            
+            <div class="field form-full" style="margin-top:1rem"><label>Video 3 URL</label><input type="text" id="v_url3" placeholder="https://…"></div>
+            <div class="field form-full"><label>Video 3 Label</label><input type="text" id="v_label3" placeholder="e.g. Kurta Pajama"></div>
+          </div>
+        </div>
+        <div class="panel-header" style="border-top:1px solid var(--border)"><span class="panel-title">General Settings</span></div>
         <div class="modal-body">
           <div class="form-grid">
             <div class="field form-full">
@@ -279,7 +293,7 @@ tbody tr:hover .action-btns{opacity:1}
           </div>
         </div>
         <div class="modal-foot">
-          <button class="btn-gold" onclick="saveSettings()">Save Settings</button>
+          <button class="btn-gold" onclick="saveSettings()">Save All Settings</button>
         </div>
       </div>
     </div>
@@ -596,6 +610,52 @@ function toggleStatus(id){
   toast('Status updated');
 }
 
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+const VIDEO_KEY = 'svg_video_showcase';
+
+function loadSettings(){
+  const s = getSettings();
+  document.getElementById('s_storeName').value = s.storeName || '';
+  document.getElementById('s_wa').value        = s.whatsappNumber || '';
+  document.getElementById('s_email').value     = s.email || '';
+  document.getElementById('s_address').value   = s.address || '';
+
+  // load videos
+  try {
+    const v = JSON.parse(localStorage.getItem(VIDEO_KEY)) || [];
+    for(let i=1; i<=3; i++) {
+      const item = v[i-1] || {};
+      document.getElementById('v_url'+i).value = item.url || '';
+      document.getElementById('v_label'+i).value = item.label || '';
+    }
+  } catch(e) {}
+}
+
+function saveSettings(){
+  const s = getSettings();
+  s.storeName      = document.getElementById('s_storeName').value;
+  s.whatsappNumber = document.getElementById('s_wa').value;
+  s.email          = document.getElementById('s_email').value;
+  s.address        = document.getElementById('s_address').value;
+  
+  const newPw = document.getElementById('s_password').value;
+  if(newPw) localStorage.setItem(PW_KEY, newPw);
+
+  localStorage.setItem(SETT_KEY, JSON.stringify(s));
+
+  // save videos
+  const v = [];
+  for(let i=1; i<=3; i++) {
+    v.push({
+      url: document.getElementById('v_url'+i).value,
+      label: document.getElementById('v_label'+i).value
+    });
+  }
+  localStorage.setItem(VIDEO_KEY, JSON.stringify(v));
+
+  toast('Settings saved!');
+  document.getElementById('s_password').value = '';
+}
 function deleteProduct(id){
   if(!confirm('Delete this product? This cannot be undone.')) return;
   saveProducts(getProducts().filter(p=>p.id!==id));

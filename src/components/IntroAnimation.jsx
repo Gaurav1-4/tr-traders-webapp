@@ -18,7 +18,7 @@ const IntroAnimation = ({ onComplete }) => {
 
   return (
     <div 
-      className={`fixed inset-0 z-[200] bg-surface flex flex-col items-center justify-center transition-opacity duration-500 ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+      className={`fixed inset-0 z-[200] bg-surface flex flex-col items-center justify-center transition-opacity duration-500 h-[100dvh] min-h-[100dvh] ${!isVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
     >
       <div className="flex flex-col items-center justify-center animate-intro-logo">
         <img 

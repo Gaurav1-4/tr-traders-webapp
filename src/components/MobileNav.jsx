@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { Home, Search, Heart, MessageCircle } from 'lucide-react';
 import { useWishlist } from '../hooks/useWishlist';
 
-const MobileNav = () => {
+const MobileNav = ({ onOpenWishlist }) => {
   const location = useLocation();
   const { wishlist } = useWishlist();
 
@@ -37,7 +37,7 @@ const MobileNav = () => {
                 if (item.action === 'whatsapp') {
                   window.open(`https://wa.me/919555835833?text=${encodeURIComponent('Hello SVG! I want to enquire about groom wear collection.')}`, '_blank');
                 } else if (item.action === 'wishlist') {
-                  window.dispatchEvent(new Event('openWishlist'));
+                  if (onOpenWishlist) onOpenWishlist();
                 } else if (item.action === 'home') {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   if (location.pathname !== '/') window.location.href = '/';

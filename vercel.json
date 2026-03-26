@@ -1,6 +1,7 @@
 {
   "name": "tr-traders-webapp",
   "rewrites": [
+    { "source": "/admin", "destination": "/admin-panel.html" },
     { "source": "/admin-panel", "destination": "/admin-panel.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

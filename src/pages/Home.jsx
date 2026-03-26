@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { getProducts } from '../services/productService';
 import { useSettings } from '../hooks/useSettings';
+import { Play } from 'lucide-react';
 
 const GROOM_CATS = ['All', 'Sherwani', 'Wedding Suit', 'Nehru Jacket', 'Kurta Pajama', 'Indo-Western', 'Jodhpuri', 'Achkan', 'Bandhgala'];
 
@@ -12,40 +13,123 @@ const MARQUEE_ITEMS = [
   'Indo-Western', 'Jodhpuri Suit', 'Achkan', 'Bandhgala',
 ];
 
-const HERO_CARDS = [
-  { emoji: '🥻', label: 'Sherwani', cat: 'Sherwani' },
-  { emoji: '🤵', label: 'Wedding Suit', cat: 'Wedding Suit' },
-  { emoji: '🎩', label: 'Jodhpuri', cat: 'Jodhpuri' },
-];
+// ─── Reads video showcase config from localStorage (set by Admin Panel) ────────
+function useVideoShowcase() {
+  const [videos, setVideos] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('svg_video_showcase') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
-// ─── Counter hook ─────────────────────────────────────────────────────────────
-function useCounter(target, duration = 1400) {
-  const [count, setCount] = useState(0);
-  const started = useRef(false);
   useEffect(() => {
-    if (started.current || target === 0) return;
-    started.current = true;
-    const step = target / (duration / 16);
-    let curr = 0;
-    const timer = setInterval(() => {
-      curr += step;
-      if (curr >= target) { setCount(target); clearInterval(timer); }
-      else setCount(Math.floor(curr));
-    }, 16);
-    return () => clearInterval(timer);
-  }, [target, duration]);
-  return count;
+    const onStorage = () => {
+      try {
+        setVideos(JSON.parse(localStorage.getItem('svg_video_showcase') || '[]'));
+      } catch { /* noop */ }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  return videos;
 }
 
+// ─── Video Card ───────────────────────────────────────────────────────────────
+const VideoCard = ({ url, label, index }) => {
+  const videoRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
 
+  // Determine if it's an embed URL (YouTube/Insta) or direct mp4
+  const isEmbed = url && (url.includes('youtube.com') || url.includes('youtu.be') || url.includes('instagram.com'));
+  const embedSrc = url ? (
+    url.includes('youtu.be/')
+      ? url.replace('youtu.be/', 'www.youtube.com/embed/')
+      : url.includes('watch?v=')
+        ? url.replace('watch?v=', 'embed/')
+        : url
+  ) : null;
 
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (playing) { videoRef.current.pause(); setPlaying(false); }
+    else { videoRef.current.play(); setPlaying(true); }
+  };
+
+  if (!url) {
+    return (
+      <div
+        className="rounded-2xl overflow-hidden flex items-center justify-center text-center p-8"
+        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(184,150,12,0.15)', minHeight: '260px' }}
+      >
+        <div>
+          <Play size={32} style={{ color: '#B8960C', margin: '0 auto 12px' }} />
+          <p className="text-xs tracking-widest uppercase" style={{ color: '#8A8A8A' }}>Video {index + 1}</p>
+          <p className="text-[10px] mt-1" style={{ color: '#555' }}>Configure in Admin Panel</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isEmbed) {
+    return (
+      <div className="rounded-2xl overflow-hidden" style={{ aspectRatio: '9/16', background: '#000', minHeight: '260px' }}>
+        <iframe
+          src={embedSrc}
+          className="w-full h-full"
+          title={label || `Video ${index + 1}`}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          loading="lazy"
+        />
+        {label && (
+          <div className="px-3 pb-3 pt-2 text-xs tracking-widest uppercase" style={{ color: '#B8960C' }}>
+            {label}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl overflow-hidden relative cursor-pointer group" onClick={togglePlay} style={{ background: '#000', minHeight: '260px' }}>
+      <video
+        ref={videoRef}
+        src={url}
+        className="w-full h-full object-cover"
+        playsInline
+        loop
+        muted={!playing}
+        preload="none"
+        style={{ display: 'block' }}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+      />
+      {!playing && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-all group-hover:bg-black/10">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: 'rgba(184,150,12,0.9)' }}>
+            <Play size={22} fill="#fff" color="#fff" />
+          </div>
+        </div>
+      )}
+      {label && (
+        <div className="absolute bottom-0 left-0 right-0 px-4 py-3 bg-gradient-to-t from-black/70 to-transparent">
+          <p className="text-xs tracking-widest uppercase font-medium" style={{ color: '#EAE2C6' }}>{label}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Main Component ────────────────────────────────────────────────────────────
 const Home = () => {
-  const navigate = useNavigate();
   const { whatsappNumber, storeName } = useSettings();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
-  const productCount = useCounter(products.length > 0 ? 200 : 0, 1400);
+  const videos = useVideoShowcase();
+  const filterBarRef = useRef(null);
 
   useEffect(() => {
     getProducts().then(data => { setProducts(data); setLoading(false); });
@@ -55,53 +139,83 @@ const Home = () => {
     ? products.slice(0, 8)
     : products.filter(p => p.category === activeCategory).slice(0, 8);
 
-  const scrollToCollection = () =>
-    document.getElementById('collection-start')?.scrollIntoView({ behavior: 'smooth' });
+  // Ensure we always have 3 video slots (fill with empty)  
+  const videoSlots = [
+    videos[0] || null,
+    videos[1] || null,
+    videos[2] || null,
+  ];
+
+  const videoLabels = [
+    videos[0]?.label || 'Sherwani Collection',
+    videos[1]?.label || 'Wedding Suits',
+    videos[2]?.label || 'Kurta Pajama',
+  ];
 
   return (
     <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg)' }}>
 
-      {/* ── 1. CINEMATIC LUXURY HERO ───────────────────────────────────────────────── */}
-      <div className="relative w-full h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
-        
-        {/* Background Image (Palace + Grooms) with slow zoom */}
-        <div 
-          className="absolute inset-0 w-full h-full bg-cover bg-bottom md:bg-center scale-105 animate-[hero-zoom_20s_ease-out_infinite_alternate]"
-          style={{ 
-            backgroundImage: 'url("https://images.unsplash.com/photo-1583391733981-8498408ee4b6?q=80&w=2000&auto=format&fit=crop")',
-            /* Fallback to another beautiful wedding if the first fails visually: photo-1595341595379-cf1cd0ed7ad1 */
+      {/* ─── 1. HERO ──────────────────────────────────────────────────────────── */}
+      <div className="relative w-full overflow-hidden" style={{ minHeight: '100dvh' }}>
+
+        {/* Background: STRICTLY local image. No external URLs. */}
+        <div
+          className="absolute inset-0 w-full h-full bg-cover bg-center animate-[hero-zoom_25s_ease-in-out_infinite_alternate]"
+          style={{
+            backgroundImage: "url('/images/hero-bg.jpg')",
+            // Fallback: neutral color only — no substitute image
+            backgroundColor: '#2C2215',
           }}
         />
 
-        {/* Soft dark gradient overlay for text readability without losing the background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent" />
-        
-        {/* Bottom vignette to ground the models */}
-        <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/20 to-transparent" />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/15 to-black/40" />
 
-        {/* Centered Typography Content */}
-        <div className="relative z-10 flex flex-col items-center text-center px-4 mt-16 md:mt-24 w-full animate-fade-up">
-          
-          <h1 className="font-serif text-[#EAE2C6] text-4xl sm:text-5xl md:text-6xl lg:text-[76px] tracking-wide uppercase font-light leading-tight drop-shadow-md">
-            Shri Vrindavan Garments
-          </h1>
-          
-          <h2 className="font-serif text-[#D4C99A] text-xs sm:text-sm md:text-base tracking-[0.3em] uppercase mt-4 md:mt-6 mb-2 drop-shadow">
-            Curators of Royal Menswear
-          </h2>
-          
-          <p className="font-serif text-white/80 text-[10px] sm:text-xs tracking-[0.4em] uppercase font-light drop-shadow">
-            Jaipur • Rajasthan
-          </p>
-          
+        {/* Hero Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center text-center h-full px-4"
+          style={{ minHeight: '100dvh', paddingTop: '80px', paddingBottom: '40px' }}
+        >
+          <div className="animate-fade-up">
+            <p className="text-[10px] sm:text-xs tracking-[0.4em] uppercase mb-6" style={{ color: '#B8960C' }}>
+              New Arrivals 2025
+            </p>
+            <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl uppercase font-light leading-none mb-4" style={{ color: '#EAE2C6', letterSpacing: '0.08em' }}>
+              {storeName || 'Shri Vrindavan Garments'}
+            </h1>
+            <p className="font-serif text-sm sm:text-base md:text-lg tracking-[0.3em] uppercase mb-8" style={{ color: '#D4C99A' }}>
+              Curators of Royal Menswear
+            </p>
+            <p className="text-[10px] tracking-[0.4em] uppercase mb-12" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              Karawal Nagar • Delhi
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <button
+                onClick={() => document.getElementById('collection-start')?.scrollIntoView({ behavior: 'smooth' })}
+                className="px-8 py-3 text-xs tracking-[0.25em] uppercase font-bold transition-all hover:scale-105"
+                style={{ background: '#B8960C', color: '#0C0A08', borderRadius: '2px' }}
+              >
+                Browse Collection
+              </button>
+              <a
+                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello ${storeName || 'SVG'}! I want to enquire about groom wear.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-8 py-3 text-xs tracking-[0.25em] uppercase font-medium border transition-all hover:scale-105 flex items-center gap-2"
+                style={{ borderColor: 'rgba(255,255,255,0.4)', color: '#EAE2C6', borderRadius: '2px' }}
+              >
+                <span className="w-2 h-2 rounded-full bg-green-400 inline-block animate-pulse" />
+                WhatsApp Enquiry
+              </a>
+            </div>
+          </div>
         </div>
-
       </div>
 
-      {/* ── 2. MARQUEE ───────────────────────────────────────────── */}
-      <div className="marquee-wrap">
+      {/* ─── 2. MARQUEE ───────────────────────────────────────────────────────── */}
+      <div className="marquee-wrap overflow-hidden" style={{ background: '#0C0A08', borderTop: '1px solid rgba(184,150,12,0.2)', borderBottom: '1px solid rgba(184,150,12,0.2)' }}>
         <div className="marquee-track">
-          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
             <span key={i} className="marquee-item">
               {item} <span className="marquee-dot" />
             </span>
@@ -109,49 +223,64 @@ const Home = () => {
         </div>
       </div>
 
-      {/* ── 2.5. CINEMATIC PROMO BANNER ────────────────────────── */}
-      <section className="relative w-full h-[500px] md:h-[600px] mt-2 overflow-hidden group">
-        <div 
-          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-1000 group-hover:scale-105"
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1583391733981-8498408ee4b6?q=80&w=2000&auto=format&fit=crop")' }}
-        ></div>
-        
-        {/* Subtle dark gradient for readability if needed, though the box handles most of it */}
-        <div className="absolute inset-0 bg-black/10"></div>
-
-        {/* Center Translucent Box */}
-        <div className="absolute inset-0 flex items-center justify-center p-4">
-          <div className="bg-[#4A5D4E]/80 backdrop-blur-sm border border-white/10 px-8 py-12 md:px-24 md:py-16 text-center shadow-2xl w-full max-w-4xl transition-all duration-700 animate-fade-up">
-            <h2 className="font-serif text-5xl md:text-7xl text-white mb-4 tracking-wide font-light">
-              Sherwani
+      {/* ─── 3. VIDEO SHOWCASE ────────────────────────────────────────────────── */}
+      <section className="py-16 md:py-24 px-4 sm:px-6 lg:px-8" style={{ background: '#0C0A08' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs tracking-[0.3em] uppercase mb-3" style={{ color: '#B8960C' }}>Lookbook</p>
+            <h2 className="font-serif text-3xl md:text-4xl font-light" style={{ color: '#EAE2C6' }}>
+              The Royal Collection
             </h2>
-            <p className="font-serif text-lg md:text-2xl text-white/90 italic tracking-widest font-light">
-              Where Royalty Meets Refinement
-            </p>
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
+            {videoSlots.map((video, i) => (
+              <VideoCard
+                key={i}
+                index={i}
+                url={video?.url || null}
+                label={videoLabels[i]}
+              />
+            ))}
+          </div>
+
+          <p className="text-center mt-6 text-[10px] tracking-widest uppercase" style={{ color: '#444' }}>
+            Videos managed via Admin Panel
+          </p>
         </div>
       </section>
 
-      {/* ── 3. FILTER CHIPS ─────────────────────────────────────── */}
-      <div id="collection-start" className="fchip-bar">
+      {/* ─── 4. STICKY FILTER BAR ─────────────────────────────────────────────── */}
+      <div
+        id="collection-start"
+        ref={filterBarRef}
+        className="sticky z-40"
+        style={{
+          top: '64px',
+          background: 'rgba(250,250,248,0.97)',
+          backdropFilter: 'blur(12px)',
+          borderBottom: '1px solid var(--border)',
+          boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar py-3">
             {GROOM_CATS.map(cat => (
               <button
                 key={cat}
-                className={`fchip ${activeCategory === cat ? 'active' : ''}`}
                 onClick={() => setActiveCategory(cat)}
+                className={`fchip flex-shrink-0 ${activeCategory === cat ? 'active' : ''}`}
                 id={`filter-${cat.toLowerCase().replace(/\s+/g, '-')}`}
               >
-                <span>{cat}</span>
+                {cat}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── 4. PRODUCT GRID ─────────────────────────────────────── */}
-      <section className="py-16 max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 w-full flex-grow">
+      {/* ─── 5. PRODUCT GRID ──────────────────────────────────────────────────── */}
+      <section className="py-12 max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 w-full flex-grow">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <SkeletonLoader count={8} />
@@ -164,18 +293,13 @@ const Home = () => {
           </div>
         ) : (
           <div className="py-20 text-center">
-            <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontStyle: 'italic', color: 'var(--muted)', marginBottom: '1rem' }}>
+            <p className="font-serif text-2xl italic mb-4" style={{ color: 'var(--muted)' }}>
               No products in this category.
             </p>
             <button
               onClick={() => setActiveCategory('All')}
-              style={{
-                background: 'none', border: 'none',
-                fontFamily: 'var(--font-body)', fontSize: '10px',
-                letterSpacing: '0.2em', textTransform: 'uppercase',
-                color: 'var(--gold)', cursor: 'pointer',
-                borderBottom: '1px solid var(--gold)', paddingBottom: '2px',
-              }}
+              className="text-[10px] tracking-[0.2em] uppercase border-b pb-0.5 hover:text-primary transition-colors"
+              style={{ color: 'var(--gold)', borderColor: 'var(--gold)' }}
             >
               View Complete Collection
             </button>
@@ -183,7 +307,7 @@ const Home = () => {
         )}
 
         {filteredProducts.length > 0 && (
-          <div className="mt-16 flex justify-center">
+          <div className="mt-12 flex justify-center">
             <Link to="/catalog" className="btn-outline">
               View All Arrivals →
             </Link>
@@ -191,51 +315,36 @@ const Home = () => {
         )}
       </section>
 
-      {/* ── 5. BRAND EDITORIAL ──────────────────────────────────── */}
+      {/* ─── 6. BRAND STORY ───────────────────────────────────────────────────── */}
       <section
-        className="py-24 px-6 lg:px-16"
+        className="py-20 px-6 lg:px-16"
         style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}
       >
-        {/* Trust Strip */}
-        <div className="brand-strip max-w-6xl mx-auto mb-20">
-          {[
-            { icon: '🎩', title: 'Premium Sherwanis', desc: 'Handcrafted embroidery, finest fabrics. Built for the groom who wants to make an entrance.' },
-            { icon: '✂️', title: 'Custom Fitting', desc: 'Every piece tailored to your measurements. Walk in, get measured, walk out legendary.' },
-            { icon: '📍', title: 'Visit Our Store', desc: '217, Street No. 5, Karawal Nagar, Delhi. Open Mon–Sat, 10AM–8:30PM.' },
-            { icon: '⭐', title: '4.9 Google Rating', desc: '975+ happy customers. Trusted by families across Delhi for over 15 years.' },
-          ].map(item => (
-            <div key={item.title} className="brand-strip-item">
-              <div className="text-3xl mb-4">{item.icon}</div>
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', color: 'var(--cream)', marginBottom: '8px' }}>{item.title}</h3>
-              <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7 }}>{item.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Brand Story */}
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-12 items-center">
           <div className="w-full md:w-1/2 text-center md:text-left">
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.2rem, 4vw, 3.5rem)', color: 'var(--cream)', fontWeight: 300, lineHeight: 1.15 }}>
+            <h2 className="font-serif text-3xl md:text-5xl font-light leading-tight" style={{ color: 'var(--text)' }}>
               Trusted by thousands.<br />
-              <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>Loved by grooms.</em>
+              <em style={{ color: 'var(--gold)' }}>Loved by grooms.</em>
             </h2>
           </div>
           <div className="w-full md:w-1/2 md:border-l md:pl-10" style={{ borderColor: 'var(--border)' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: '14px', color: 'var(--muted)', lineHeight: 1.9, marginBottom: '1.5rem' }}>
-              Based in the heart of Karawal Nagar, Delhi, {storeName} has been dressing
-              grooms for over 15 years. From a single Sherwani to a complete wedding wardrobe,
-              we guarantee the best price and unmatched quality.
+            <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--muted)' }}>
+              Based in the heart of Karawal Nagar, Delhi, {storeName || 'Shri Vrindavan Garments'} has been
+              dressing grooms for over 15 years. From a single Sherwani to a complete wedding
+              wardrobe, we guarantee the best price and unmatched quality.
             </p>
-            <p style={{ fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: '1.4rem', color: 'var(--gold)', marginBottom: '1.5rem' }}>
+            <p className="font-serif text-xl italic mb-6" style={{ color: 'var(--gold)' }}>
               "Quality Clothing. Best Price. Trusted Choice."
             </p>
-            <button
-              onClick={() => window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello ${storeName}! I am interested in a custom order for groom wear. Please share more details.`)}`, '_blank')}
-              className="btn-primary"
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Hello ${storeName || 'SVG'}! I am interested in a custom order for groom wear.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary inline-flex items-center gap-2"
             >
-              <span className="wa-dot mr-2"></span>
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               Wholesale Enquiries
-            </button>
+            </a>
           </div>
         </div>
       </section>

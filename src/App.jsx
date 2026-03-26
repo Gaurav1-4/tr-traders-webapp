@@ -26,7 +26,7 @@ const UserLayout = () => {
         <Outlet />
       </main>
       <Footer />
-      <MobileNav />
+      <MobileNav onOpenWishlist={() => setIsWishlistOpen(true)} />
       <WishlistModal isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
     </div>
   );

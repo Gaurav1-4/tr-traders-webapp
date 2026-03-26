@@ -1,151 +1,247 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, Facebook, Youtube, Instagram, Linkedin, MapPin } from 'lucide-react';
+import { Menu, X, Heart, Facebook, Instagram, MapPin } from 'lucide-react';
+import { useWishlist } from '../hooks/useWishlist';
 import { useSettings } from '../hooks/useSettings';
+
+const SOCIAL_LINKS = [
+  {
+    icon: Facebook,
+    href: 'https://www.facebook.com/p/SVG-Ethnic-wear-By-Sri-Vrindavan-garments-61566550774578/',
+    label: 'SVG on Facebook',
+  },
+  {
+    icon: Instagram,
+    href: 'https://www.instagram.com/sri_vrindavan_garments/',
+    label: 'SVG on Instagram',
+  },
+];
+
+const NAV_LINKS = [
+  { name: 'Home', path: '/' },
+  { name: 'Collection', path: '/catalog' },
+  { name: 'About', path: '/about' },
+];
 
 const Navbar = ({ onOpenWishlist }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { wishlist } = useWishlist();
   const { whatsappNumber, storeName } = useSettings();
+
+  const isHome = location.pathname === '/';
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 40);
-      if (isOpen) setIsOpen(false); // Close mobile menu on scroll
+      setScrolled(window.scrollY > 50);
+      if (isOpen) setIsOpen(false);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, [isOpen]);
 
-  // Determine if we need the transparent theme (only on Home page hero ideally)
-  const isHome = location.pathname === '/';
-  
-  // Dynamic styling based on scroll & page
-  const navBg = scrolled ? 'rgba(26,26,26,0.95)' : isHome ? 'transparent' : 'rgba(26,26,26,0.95)';
-  const textColor = scrolled ? 'text-white/90' : isHome ? 'text-white/90' : 'text-white/90';
-  const logoScale = scrolled ? 'scale-75 translate-y-2' : 'scale-100 translate-y-4';
+  // Close menu when route changes
+  useEffect(() => { setIsOpen(false); }, [location.pathname]);
 
-  const navLinks = [
-    { name: 'HOME', path: '/' },
-    { name: 'ABOUT US', path: '/about' },
-    { name: 'WOMEN', path: '#' },
-    { name: 'MEN', path: '/catalog' },
-    { name: 'CONTACT US', path: '#contact' },
-  ];
-
-  const socialLinks = [
-    { icon: Facebook, href: '#' },
-    { icon: Youtube, href: '#' },
-    { icon: Instagram, href: '#' },
-    { icon: Linkedin, href: '#' }
-  ];
+  const transparent = isHome && !scrolled;
 
   return (
     <>
       <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-500`}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-400"
         style={{
-          background: navBg,
-          backdropFilter: scrolled ? 'blur(12px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.05)' : 'none',
+          background: transparent ? 'transparent' : 'rgba(12,10,8,0.96)',
+          backdropFilter: transparent ? 'none' : 'blur(16px)',
+          borderBottom: transparent ? 'none' : '1px solid rgba(184,150,12,0.15)',
+          boxShadow: transparent ? 'none' : '0 4px 24px rgba(0,0,0,0.3)',
         }}
       >
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-8 h-20 md:h-24 flex items-center justify-between relative">
-          
-          {/* Mobile Menu Toggle */}
-          <div className="md:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className={`${textColor} p-2 -ml-2`}>
-              {isOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
 
-          {/* LEFT: Navigation Links (Desktop) */}
-          <div className={`hidden md:flex items-center gap-8 ${textColor}`}>
-            {navLinks.map((link) => (
-              <Link 
-                key={link.name} 
-                to={link.path}
-                className="text-xs lg:text-[13px] tracking-[0.15em] font-medium hover:text-gold transition-colors relative group py-2"
-              >
-                {link.name}
-                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-gold transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            ))}
-          </div>
-
-          {/* CENTER: Breaking out Logo */}
-          <div className="absolute left-1/2 -translate-x-1/2 top-4 md:top-6 z-50 flex flex-col items-center">
-            <Link 
-              to="/" 
-              className={`relative block rounded-full transition-transform duration-500 origin-top shadow-[0_4px_30px_rgba(0,0,0,0.3)] ${logoScale}`}
-            >
-              <div className="absolute inset-0 rounded-full border-[1.5px] border-gold/60 scale-105 pointer-events-none"></div>
-              <div className="absolute inset-0 rounded-full border-[1.5px] border-gold/30 scale-110 pointer-events-none"></div>
-              <img 
-                src="/images/svg-logo.png" 
-                alt={storeName} 
-                className="w-20 h-20 md:w-28 md:h-28 rounded-full object-contain bg-[#1A1A1A] p-1 shadow-2xl"
+            {/* LEFT: Logo + Brand */}
+            <Link to="/" className="flex items-center gap-3 flex-shrink-0">
+              <img
+                src="/images/svg-logo.png"
+                alt={storeName || 'SVG'}
+                className="h-10 w-10 md:h-12 md:w-12 rounded-full object-contain"
+                style={{ background: '#1A1208', padding: '2px' }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
-            </Link>
-          </div>
-
-          {/* RIGHT: Socials & Reach Us */}
-          <div className="flex items-center gap-4 md:gap-6">
-            <div className={`hidden lg:flex items-center gap-3 ${textColor}`}>
-              {socialLinks.map((social, i) => (
-                <a 
-                  key={i} 
-                  href={social.href}
-                  className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#1A1A1A] hover:bg-gold hover:text-white transition-all shadow-md transform hover:scale-110"
+              <div className="hidden sm:block">
+                <div
+                  className="font-serif text-sm md:text-base leading-tight tracking-widest uppercase"
+                  style={{ color: '#EAE2C6' }}
                 >
-                  <social.icon size={16} strokeWidth={2} />
-                </a>
+                  {storeName || 'Shri Vrindavan Garments'}
+                </div>
+                <div className="text-[9px] tracking-[0.25em] uppercase" style={{ color: '#B8960C' }}>
+                  The Groom's House
+                </div>
+              </div>
+            </Link>
+
+            {/* CENTER: Nav Links (Desktop) */}
+            <div className="hidden md:flex items-center gap-8">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className="relative text-[11px] tracking-[0.2em] uppercase font-medium py-1 group transition-colors"
+                  style={{ color: location.pathname === link.path ? '#B8960C' : '#EAE2C6' }}
+                >
+                  {link.name}
+                  <span
+                    className="absolute bottom-0 left-0 h-[1px] transition-all duration-300 group-hover:w-full"
+                    style={{
+                      background: '#B8960C',
+                      width: location.pathname === link.path ? '100%' : '0%',
+                    }}
+                  />
+                </Link>
               ))}
             </div>
-            
-            <button 
-              onClick={() => window.open(`https://wa.me/${whatsappNumber}?text=Hello! I want to visit the store.`, '_blank')}
-              className="bg-white text-[#1A1A1A] px-4 md:px-6 py-2.5 md:py-3 rounded hover:bg-white/90 transition-all font-medium text-xs md:text-[11px] tracking-[0.15em] flex items-center gap-2 shadow-lg uppercase"
-            >
-              <MapPin size={16} className="text-[#1A1A1A]" />
-              Reach Us
-            </button>
+
+            {/* RIGHT: Social Icons + Wishlist + Reach Us */}
+            <div className="flex items-center gap-3 md:gap-4">
+              {/* Social Icons (desktop) */}
+              <div className="hidden md:flex items-center gap-2">
+                {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
+                  <a
+                    key={href}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                    style={{
+                      background: 'rgba(255,255,255,0.12)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      color: '#EAE2C6',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#B8960C'; e.currentTarget.style.color = '#000'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = '#EAE2C6'; }}
+                  >
+                    <Icon size={14} />
+                  </a>
+                ))}
+              </div>
+
+              {/* Admin Portal (Subtle) */}
+              <a
+                href="/admin-panel"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#8A8A8A',
+                }}
+                title="Admin Portal"
+              >
+                <div className="text-[10px] font-bold">AD</div>
+              </a>
+
+              {/* Wishlist */}
+              <button
+                onClick={onOpenWishlist}
+                aria-label="Open Wishlist"
+                className="relative w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  color: wishlist.length > 0 ? '#B8960C' : '#EAE2C6',
+                }}
+              >
+                <Heart size={16} className={wishlist.length > 0 ? 'fill-current' : ''} />
+                {wishlist.length > 0 && (
+                  <span
+                    className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] flex items-center justify-center font-bold"
+                    style={{ background: '#B8960C', color: '#0C0A08' }}
+                  >
+                    {wishlist.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Reach Us button (desktop) */}
+              <a
+                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello! I want to visit your store.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden md:flex items-center gap-2 px-4 py-2 rounded text-[10px] tracking-[0.2em] uppercase font-semibold transition-all hover:scale-105"
+                style={{ background: '#ffffff', color: '#1A1A1A', boxShadow: '0 2px 12px rgba(0,0,0,0.25)' }}
+              >
+                <MapPin size={13} />
+                Reach Us
+              </a>
+
+              {/* Mobile Hamburger */}
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="md:hidden w-9 h-9 flex items-center justify-center rounded"
+                aria-label="Toggle Menu"
+                style={{ color: '#EAE2C6' }}
+              >
+                {isOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Mobile Dropdown Menu */}
-        <div 
-          className={`md:hidden absolute top-full left-0 w-full bg-[#1A1A1A] border-t border-white/10 transition-all duration-300 overflow-hidden ${isOpen ? 'max-h-[400px] opacity-100 shadow-2xl' : 'max-h-0 opacity-0'}`}
+        {/* Mobile Dropdown */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[360px]' : 'max-h-0'}`}
+          style={{ background: 'rgba(12,10,8,0.98)', borderTop: '1px solid rgba(184,150,12,0.15)' }}
         >
-          <div className="px-6 py-4 flex flex-col">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.name} 
+          <div className="px-6 py-4 space-y-1">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.name}
                 to={link.path}
-                onClick={() => setIsOpen(false)}
-                className="py-4 border-b border-white/5 text-white/90 text-xs tracking-[0.2em] uppercase font-medium hover:text-gold transition-colors"
+                className="block py-3 border-b text-xs tracking-[0.2em] uppercase font-medium transition-colors hover:text-gold"
+                style={{
+                  borderColor: 'rgba(255,255,255,0.06)',
+                  color: location.pathname === link.path ? '#B8960C' : '#EAE2C6',
+                }}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="py-4 flex gap-4">
-               {socialLinks.map((social, i) => (
-                <a 
-                  key={i} 
-                  href={social.href}
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-gold transition-colors"
+
+            {/* Social Icons (mobile) */}
+            <div className="flex items-center gap-3 pt-4">
+              {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
+                <a
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: '#EAE2C6' }}
                 >
-                  <social.icon size={18} />
+                  <Icon size={16} />
                 </a>
               ))}
+              <a
+                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello! I want to visit your store.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto flex items-center gap-2 px-4 py-2 rounded text-[10px] tracking-[0.2em] uppercase font-bold"
+                style={{ background: '#ffffff', color: '#1A1208' }}
+              >
+                <MapPin size={12} />
+                Reach Us
+              </a>
             </div>
           </div>
         </div>
       </nav>
-      {/* Spacer to prevent content from jumping when not on Home page (since transparent nav overlays content) */}
-      {!isHome && <div className="h-20 md:h-24 bg-[#1A1A1A]"></div>}
+
+      {/* Non-home spacer so content starts below fixed nav */}
+      {!isHome && <div className="h-16 md:h-20 bg-[#0C0A08]" />}
     </>
   );
 };
