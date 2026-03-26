@@ -141,6 +141,29 @@ const Home = () => {
         </div>
       </div>
 
+      {/* ── 2.5. CINEMATIC PROMO BANNER ────────────────────────── */}
+      <section className="relative w-full h-[500px] md:h-[600px] mt-2 overflow-hidden group">
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-1000 group-hover:scale-105"
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1583391733981-8498408ee4b6?q=80&w=2000&auto=format&fit=crop")' }}
+        ></div>
+        
+        {/* Subtle dark gradient for readability if needed, though the box handles most of it */}
+        <div className="absolute inset-0 bg-black/10"></div>
+
+        {/* Center Translucent Box */}
+        <div className="absolute inset-0 flex items-center justify-center p-4">
+          <div className="bg-[#4A5D4E]/80 backdrop-blur-sm border border-white/10 px-8 py-12 md:px-24 md:py-16 text-center shadow-2xl w-full max-w-4xl transition-all duration-700 animate-fade-up">
+            <h2 className="font-serif text-5xl md:text-7xl text-white mb-4 tracking-wide font-light">
+              Sherwani
+            </h2>
+            <p className="font-serif text-lg md:text-2xl text-white/90 italic tracking-widest font-light">
+              Where Royalty Meets Refinement
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── 3. FILTER CHIPS ─────────────────────────────────────── */}
       <div id="collection-start" className="fchip-bar">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
