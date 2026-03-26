@@ -131,7 +131,7 @@ const Navbar = ({ onOpenWishlist }) => {
 
               {/* Admin Portal (Subtle) */}
               <a
-                href="/admin-panel"
+                href="/admin-panel.html"
                 className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:scale-110"
                 style={{
                   background: 'rgba(255,255,255,0.06)',

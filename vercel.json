@@ -3,6 +3,7 @@
   "rewrites": [
     { "source": "/admin", "destination": "/admin-panel.html" },
     { "source": "/admin-panel", "destination": "/admin-panel.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/admin-panel.html", "destination": "/admin-panel.html" },
+    { "source": "/((?!admin-panel.html|images|assets|favicon.svg|icons.svg).*)", "destination": "/index.html" }
   ]
 }
